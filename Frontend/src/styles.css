@@ -64,3 +64,623 @@
 .ai-input-row input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(255,106,26,.12)}
 .ai-input-row .primary-btn{padding:11px 16px;font-size:13.5px;box-shadow:none}
 @media(max-width:520px){.ai-assistant{right:14px;bottom:14px}.ai-panel{height:min(70vh,520px)}}
+
+
+/* =========================================================
+   MOBILE UX FIX — SmartCity Portal
+   Keeps desktop styling intact and improves phones/tablets.
+   ========================================================= */
+
+html, body {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+img, video, iframe {
+  max-width: 100%;
+}
+
+/* Better tap targets everywhere */
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (max-width: 850px) {
+  .container,
+  .nav-inner {
+    width: calc(100% - 28px);
+  }
+
+  /* ---------- Navigation ---------- */
+  .app-nav {
+    height: auto;
+    min-height: 64px;
+  }
+
+  .nav-inner {
+    min-height: 64px;
+    gap: 10px;
+    padding: 8px 0;
+  }
+
+  .brand {
+    gap: 8px;
+    font-size: 16px;
+  }
+
+  .brand-mark {
+    width: 36px;
+    height: 36px;
+    border-radius: 11px;
+  }
+
+  .nav-links {
+    display: none;
+  }
+
+  .nav-user {
+    gap: 7px;
+  }
+
+  .user-name {
+    display: none;
+  }
+
+  .avatar {
+    width: 34px;
+    height: 34px;
+  }
+
+  .ghost-btn {
+    min-height: 40px;
+    padding: 9px 11px;
+  }
+
+  /* ---------- Main content ---------- */
+  .page {
+    padding: 26px 0 60px;
+  }
+
+  .hero-row {
+    gap: 16px;
+    margin-bottom: 22px;
+  }
+
+  .hero-row h1 {
+    font-size: clamp(28px, 8vw, 36px);
+    line-height: 1.05;
+  }
+
+  .hero-row p {
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  .actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .actions .button,
+  .actions .ghost-btn {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  /* ---------- Dashboard stats ---------- */
+  .stat-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+
+  .stat {
+    padding: 14px 12px;
+    border-radius: 13px;
+  }
+
+  .stat-top {
+    font-size: 11px;
+    gap: 4px;
+  }
+
+  .stat-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    font-size: 12px;
+  }
+
+  .stat-number {
+    font-size: 25px;
+    margin-top: 7px;
+  }
+
+  /* ---------- Panels ---------- */
+  .panel {
+    border-radius: 14px;
+  }
+
+  .panel-head {
+    padding: 15px;
+    gap: 10px;
+  }
+
+  .panel-head h3 {
+    font-size: 16px;
+  }
+
+  .panel-head span {
+    font-size: 11px;
+  }
+
+  /* ---------- Tables: horizontal scroll instead of breaking layout ---------- */
+  .table-panel {
+    overflow: hidden;
+  }
+
+  .table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+
+  table {
+    min-width: 720px;
+  }
+
+  th,
+  td {
+    padding: 12px 13px;
+    font-size: 13px;
+  }
+
+  th {
+    font-size: 10px;
+  }
+
+  /* ---------- Forms ---------- */
+  .form-panel {
+    width: 100%;
+    max-width: none;
+    padding: 20px 16px;
+    border-radius: 14px;
+  }
+
+  .form-panel h2 {
+    font-size: 24px;
+    line-height: 1.15;
+  }
+
+  .subtitle {
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .form-grid .full-field {
+    grid-column: auto;
+  }
+
+  .field {
+    margin-bottom: 15px;
+    gap: 7px;
+  }
+
+  .field label {
+    font-size: 12px;
+  }
+
+  .field input,
+  .field select,
+  .field textarea {
+    min-height: 46px;
+    padding: 12px 13px;
+    font-size: 16px; /* prevents iOS Safari zoom */
+    border-radius: 11px;
+  }
+
+  .field textarea {
+    min-height: 130px;
+  }
+
+  .form-footer {
+    display: grid;
+    grid-template-columns: 1fr 1.35fr;
+    gap: 9px;
+    margin-top: 12px;
+  }
+
+  .form-footer .button,
+  .form-footer .ghost-btn {
+    width: 100%;
+    min-height: 46px;
+  }
+
+  /* ---------- Photo evidence ---------- */
+  .photo-dropzone {
+    padding: 22px 14px;
+    border-radius: 13px;
+  }
+
+  .photo-preview {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .photo-preview img {
+    width: 100%;
+    max-height: 300px;
+  }
+
+  .photo-dropzone-actions {
+    width: 100%;
+  }
+
+  .photo-dropzone-actions .button,
+  .photo-dropzone-actions .ghost-btn {
+    flex: 1;
+    min-height: 44px;
+  }
+
+  .geo-badge {
+    width: 100%;
+    max-width: none;
+    font-size: 12px;
+  }
+
+  .muni-chip {
+    max-width: 100%;
+  }
+
+  /* ---------- Admin banner ---------- */
+  .admin-banner {
+    padding: 20px;
+    border-radius: 15px;
+    display: block;
+  }
+
+  .admin-banner h1 {
+    font-size: 25px;
+    line-height: 1.15;
+  }
+
+  .admin-banner p {
+    font-size: 13px;
+    line-height: 1.5;
+    max-width: 90%;
+  }
+
+  .admin-pill {
+    display: inline-flex;
+    margin-top: 14px;
+  }
+
+  /* ---------- Auth ---------- */
+  .auth-page {
+    min-height: 100dvh;
+    display: block;
+  }
+
+  .auth-visual {
+    display: none;
+  }
+
+  .auth-form-side {
+    min-height: 100dvh;
+    width: 100%;
+    padding: 28px 18px 40px;
+    align-items: flex-start;
+  }
+
+  .auth-card {
+    width: 100%;
+    max-width: 460px;
+    margin: auto;
+    padding-top: 8px;
+  }
+
+  .auth-card .brand {
+    margin-bottom: 38px;
+  }
+
+  .auth-card h2 {
+    font-size: 30px;
+    line-height: 1.1;
+  }
+
+  .auth-card .subtitle {
+    margin-bottom: 24px;
+  }
+
+  .demo-box {
+    padding: 12px;
+    line-height: 1.45;
+  }
+
+  .primary-btn,
+  .button {
+    min-height: 46px;
+  }
+
+  .link-row {
+    font-size: 13px;
+    margin-top: 18px;
+  }
+
+  /* ---------- OTP ---------- */
+  .step-label {
+    margin-bottom: 20px;
+    gap: 6px;
+    font-size: 10px;
+  }
+
+  .step-dot {
+    width: 22px;
+    height: 22px;
+    flex: none;
+  }
+
+  .step-label i {
+    width: 20px;
+  }
+
+  .otp-input {
+    min-height: 58px;
+    font-size: 25px;
+    letter-spacing: 8px;
+    padding: 13px 8px 13px 16px;
+  }
+
+  .otp-meta {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  /* ---------- AI assistant ---------- */
+  .ai-assistant {
+    right: 12px;
+    bottom: max(12px, env(safe-area-inset-bottom));
+  }
+
+  .ai-fab {
+    width: 54px;
+    height: 54px;
+  }
+
+  .ai-panel {
+    position: fixed;
+    left: 10px;
+    right: 10px;
+    bottom: max(10px, env(safe-area-inset-bottom));
+    width: auto;
+    height: min(72dvh, 560px);
+    max-height: calc(100dvh - 90px);
+    border-radius: 18px;
+  }
+
+  .ai-body {
+    padding: 14px 12px;
+  }
+
+  .ai-input-row {
+    padding: 10px;
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
+  }
+
+  .ai-input-row input {
+    min-width: 0;
+    font-size: 16px; /* prevents iOS zoom */
+  }
+
+  .ai-input-row .primary-btn {
+    min-width: 72px;
+    padding: 10px 12px;
+  }
+
+  /* Camera should fit short phone screens */
+  .camera-modal {
+    padding: 10px;
+  }
+
+  .camera-modal-inner {
+    width: 100%;
+    max-width: 480px;
+    max-height: 96dvh;
+    border-radius: 16px;
+  }
+
+  .camera-stage {
+    max-height: 75dvh;
+  }
+
+  .camera-controls {
+    padding: 13px 18px;
+  }
+
+  .shutter-btn {
+    width: 58px;
+    height: 58px;
+  }
+}
+
+@media (max-width: 520px) {
+  .container,
+  .nav-inner {
+    width: calc(100% - 20px);
+  }
+
+  .page {
+    padding: 22px 0 50px;
+  }
+
+  /* Compact mobile header */
+  .app-nav {
+    min-height: 60px;
+  }
+
+  .nav-inner {
+    min-height: 60px;
+  }
+
+  .brand {
+    font-size: 15px;
+  }
+
+  .brand-mark {
+    width: 34px;
+    height: 34px;
+    font-size: 16px;
+  }
+
+  .nav-user {
+    margin-left: auto;
+  }
+
+  .ghost-btn {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+
+  /* Three tiny stat cards stay on one row */
+  .stat-grid {
+    gap: 7px;
+  }
+
+  .stat {
+    padding: 12px 9px;
+  }
+
+  .stat-top {
+    font-size: 10px;
+    min-height: 28px;
+    align-items: flex-start;
+  }
+
+  .stat-top span:first-child {
+    line-height: 1.2;
+  }
+
+  .stat-icon {
+    display: none;
+  }
+
+  .stat-number {
+    font-size: 23px;
+  }
+
+  .hero-row h1 {
+    font-size: 29px;
+  }
+
+  .actions {
+    grid-template-columns: 1fr;
+  }
+
+  .actions .button,
+  .actions .ghost-btn {
+    min-height: 45px;
+  }
+
+  .form-panel {
+    padding: 18px 14px;
+  }
+
+  .form-panel h2 {
+    font-size: 22px;
+  }
+
+  .form-footer {
+    grid-template-columns: 1fr;
+  }
+
+  .form-footer .button,
+  .form-footer .ghost-btn {
+    min-height: 46px;
+  }
+
+  .admin-banner {
+    padding: 18px;
+  }
+
+  .admin-banner h1 {
+    font-size: 23px;
+  }
+
+  .auth-form-side {
+    padding: 22px 15px 35px;
+  }
+
+  .auth-card .brand {
+    margin-bottom: 32px;
+  }
+
+  .auth-card h2 {
+    font-size: 28px;
+  }
+
+  .otp-input {
+    letter-spacing: 6px;
+    font-size: 23px;
+  }
+
+  .camera-controls {
+    padding: 12px 14px;
+  }
+}
+
+/* Very small phones */
+@media (max-width: 360px) {
+  .container,
+  .nav-inner {
+    width: calc(100% - 16px);
+  }
+
+  .stat {
+    padding: 10px 7px;
+  }
+
+  .stat-number {
+    font-size: 21px;
+  }
+
+  .stat-top {
+    font-size: 9px;
+  }
+
+  .brand {
+    font-size: 14px;
+  }
+
+  .ghost-btn {
+    font-size: 11px;
+    padding: 8px;
+  }
+
+  .auth-form-side {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}
+
+/* Respect phones with a home-indicator / safe area */
+@supports (padding: max(0px)) {
+  .app-nav {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .page {
+    padding-bottom: max(50px, env(safe-area-inset-bottom));
+  }
+}
