@@ -35,7 +35,7 @@ export default function Dashboard(){
         <span className="eyebrow" style={{color:'var(--primary)'}}>
           Citizen dashboard
         </span>
-        <h1>Hello, {user?.name?.split(' ')[0] || 'there'}.</h1>
+        <h1>👋 Hello, {user?.name?.split(' ')[0] || 'there'}.</h1>
         <p>Here’s the latest on the issues you’ve reported.</p>
       </div>
 

@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { sendCitizenSignupOtp, verifyCitizenSignupOtp } from '../../api/citizenAuth.api';
 import { useAuth } from '../../context/AuthContext';
 import Message from '../../components/Message';
+import BridgeSketch from '../../components/BridgeSketch';
+import brandMark from '../../assets/brand-mark.png';
 
 export default function CitizenSignup() {
   const [step, setStep] = useState('details');
@@ -53,12 +55,12 @@ export default function CitizenSignup() {
   return (
     <div className="auth-page">
       <section className="auth-visual">
-        <Link className="brand" to="/citizen/login"><span className="brand-mark">⌂</span><span>SmartCity</span></Link>
-        <div className="auth-copy"><span className="eyebrow">Built for better neighborhoods</span><h1>Speak up. Track it. See change.</h1><p>Create a simple account to report problems around your city and follow every update from submission to resolution.</p><div className="security-note"><span>✓</span><div><strong>Passwordless & secure</strong><small>We verify your email with a one-time code.</small></div></div></div>
-        <div className="city-grid">{Array.from({ length: 8 }, (_, i) => <span key={i} />)}</div>
+        <Link className="brand" to="/citizen/login"><span className="brand-mark"><img src={brandMark} alt="" style={{width:22,height:22,objectFit:'contain'}}/></span><span>SmartCity</span></Link>
+        <div className="auth-copy"><span className="eyebrow">Built for better neighborhoods</span><h1>Speak up. Track it. See change.</h1><p>Create a simple account to report problems around your city and follow every update from submission to resolution.</p><div className="security-note"><span>✓</span><div><strong>Passwordless & secure</strong><small>We verify your email with a one-time code.</small></div></div><span style={{display:'inline-flex',alignItems:'center',gap:6,marginTop:16,fontSize:13,fontWeight:700,color:'rgba(255,255,255,.85)',position:'relative',zIndex:1}}>📍 Howrah Bridge, Kolkata</span></div>
+        <BridgeSketch/>
       </section>
       <section className="auth-form-side"><div className="auth-card">
-        <Link className="brand" to="/citizen/login"><span className="brand-mark">⌂</span><span>SmartCity Portal</span></Link>
+        <Link className="brand" to="/citizen/login"><span className="brand-mark"><img src={brandMark} alt="" style={{width:22,height:22,objectFit:'contain'}}/></span><span>SmartCity Portal</span></Link>
         {step === 'details' ? <>
           <div className="step-label"><span className="step-dot active">1</span><span>Account details</span><i /><span className="step-dot">2</span><span>Verify email</span></div>
           <h2>Create your account</h2><p className="subtitle">No password needed. We'll send a one-time code to verify your email.</p>
