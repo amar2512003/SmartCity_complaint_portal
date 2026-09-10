@@ -9,20 +9,78 @@ You help citizens:
 - Pick the right category: Road, Water, Garbage, Street Light, or Other.
 - Understand grievance statuses: "pending" (received, not yet reviewed), "in_progress" (being worked on), "resolved" (fixed), "rejected" (not actionable).
 - Write clearer, more specific grievance descriptions when asked.
-- Understand general civic/municipal processes in India at a high level.
 
 You cannot look up a citizen's account data, personal grievance records, or live status yourself — if asked, tell them to check "My Dashboard" and offer to help interpret what they find there.
-Keep replies short, friendly, and practical (usually under 120 words) unless the citizen asks for detail. Use plain language, not jargon. If a question is unrelated to civic issues or the portal, answer briefly and helpfully but steer back to how you can help with their grievance.`;
+
+Keep replies short, friendly, and practical (usually under 120 words) unless the citizen asks for detail. Use plain language, not jargon.
+
+If a question is unrelated to the SmartCity portal, do not answer it. Politely state that you can only help with the SmartCity portal and its grievance services.`;
+
+
+// Simple guardrail to allow only SmartCity-related questions
+const SMARTCITY_KEYWORDS = [
+  'smartcity',
+  'smart city',
+  'grievance',
+  'complaint',
+  'dashboard',
+  'login',
+  'signup',
+  'sign up',
+  'otp',
+  'photo',
+  'camera',
+  'location',
+  'latitude',
+  'longitude',
+  'google maps',
+  'municipal',
+  'municipality',
+  'district',
+  'status',
+  'track',
+  'tracking',
+  'category',
+  'road',
+  'water',
+  'garbage',
+  'street light',
+];
+
+function isSmartCityQuery(message) {
+  const text = message.toLowerCase();
+  return SMARTCITY_KEYWORDS.some((keyword) => text.includes(keyword));
+}
+
 
 export async function chat(req, res) {
   try {
     if (!env.groqApiKey) {
-      return fail(res, 'AI assistant is not configured. Ask the administrator to set GROQ_API_KEY.', 503);
+      return fail(
+        res,
+        'AI assistant is not configured. Ask the administrator to set GROQ_API_KEY.',
+        503
+      );
     }
 
     const { messages } = req.body;
+
     if (!Array.isArray(messages) || messages.length === 0) {
       return fail(res, 'messages array is required', 422);
+    }
+
+    // Guardrail: check only the latest user message
+    const latestMessage = messages[messages.length - 1]?.content || '';
+
+    if (!isSmartCityQuery(latestMessage)) {
+      return res.json({
+        success: true,
+        message: 'Success',
+        data: {
+          reply:
+            "I'm here to help with the SmartCity portal and civic grievance services. I can help you submit a grievance, track a complaint, understand categories, location capture, routing, or other SmartCity features.",
+        },
+      });
     }
 
     // Keep the payload small: system prompt + last 12 turns from the client.
@@ -39,7 +97,10 @@ export async function chat(req, res) {
       },
       body: JSON.stringify({
         model: env.groqModel,
-        messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...trimmed],
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT },
+          ...trimmed,
+        ],
         temperature: 0.5,
         max_tokens: 500,
       }),
@@ -48,16 +109,38 @@ export async function chat(req, res) {
     if (!groqRes.ok) {
       const detail = await groqRes.text().catch(() => '');
       console.error('Groq API error:', groqRes.status, detail);
-      return fail(res, 'The AI assistant is unavailable right now. Please try again shortly.', 502);
+
+      return fail(
+        res,
+        'The AI assistant is unavailable right now. Please try again shortly.',
+        502
+      );
     }
 
     const data = await groqRes.json();
-    const reply = data?.choices?.[0]?.message?.content?.trim();
-    if (!reply) return fail(res, 'The AI assistant returned an empty response.', 502);
 
-    return res.json({ success: true, message: 'Success', data: { reply } });
+    const reply = data?.choices?.[0]?.message?.content?.trim();
+
+    if (!reply) {
+      return fail(
+        res,
+        'The AI assistant returned an empty response.',
+        502
+      );
+    }
+
+    return res.json({
+      success: true,
+      message: 'Success',
+      data: { reply },
+    });
   } catch (e) {
     console.error('Assistant chat error:', e);
-    return fail(res, 'Could not reach the AI assistant.', 500);
+
+    return fail(
+      res,
+      'Could not reach the AI assistant.',
+      500
+    );
   }
 }
