@@ -1,0 +1,2 @@
+import { db } from '../config/db.js'; import { hashPassword } from '../utils/hash.util.js';
+const run=async()=>{const email='admin@smartcity.com';const exists=await db('users').where({email}).first();if(!exists)await db('users').insert({name:'City Admin',email,password_hash:await hashPassword('admin123'),role:'admin'});console.log('Admin: admin@smartcity.com / admin123');await db.destroy();};run().catch(e=>{console.error(e);process.exit(1)});

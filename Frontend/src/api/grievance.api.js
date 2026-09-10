@@ -1,0 +1,1 @@
+import api from './axiosInstance'; export const getMyGrievances=()=>api.get('/grievances'); export const createGrievance=(data)=>api.post('/grievances',data); export const getAllGrievances=()=>api.get('/admin/grievances'); export const updateStatus=(id,status)=>api.patch(`/admin/grievances/${id}/status`,{status});

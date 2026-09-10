@@ -1,0 +1,5 @@
+import { db } from '../config/db.js';
+export const createGrievance=async({citizenId,title,description,category,photo,latitude,longitude,locationAccuracy,locationAddress,municipalBody,municipalDistrict})=>{const [g]=await db('grievances').insert({citizen_id:citizenId,title,description,category,photo:photo||null,latitude:latitude??null,longitude:longitude??null,location_accuracy:locationAccuracy??null,location_address:locationAddress||null,municipal_body:municipalBody||null,municipal_district:municipalDistrict||null,status:'pending'}).returning('*');return g;};
+export const getCitizenGrievances=(citizenId)=>db('grievances').where({citizen_id:citizenId}).orderBy('created_at','desc');
+export const getAllGrievances=()=>db('grievances').join('users','users.id','grievances.citizen_id').select('grievances.*','users.name as citizen_name','users.email as citizen_email').orderBy('grievances.created_at','desc');
+export const updateGrievanceStatus=async(id,status)=>{const [g]=await db('grievances').where({id}).update({status,updated_at:db.fn.now()}).returning('*');return g;};

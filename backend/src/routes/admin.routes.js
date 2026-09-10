@@ -1,0 +1,2 @@
+import { Router } from 'express'; import { z } from 'zod'; import { verifyAuth } from '../middleware/auth.middleware.js'; import { requireRole } from '../middleware/role.middleware.js'; import { validate } from '../middleware/validate.middleware.js'; import * as c from '../controllers/admin.controller.js';
+const r=Router(); r.use(verifyAuth,requireRole('admin')); r.get('/grievances',c.all); r.patch('/grievances/:id/status',validate(z.object({status:z.string()})),c.updateStatus); export default r;
