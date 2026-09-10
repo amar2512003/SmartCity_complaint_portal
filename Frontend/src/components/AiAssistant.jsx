@@ -3,6 +3,27 @@ import { sendChatMessage } from '../api/assistant.api';
 
 const WELCOME = "Hi! I'm your Citizen Desk assistant. Ask me how to report an issue, which category to pick, or what a status like \"in progress\" means.";
 
+// Turns **bold** markers and line breaks into real React elements.
+// Deliberately minimal (no markdown lib) — just enough for the assistant's replies.
+function formatMessage(text) {
+  const lines = String(text).split('\n');
+  return lines.map((line, li) => {
+    const parts = line.split(/(\*\*[^*]+\*\*)/g).filter(Boolean);
+    return (
+      <span key={li}>
+        {parts.map((part, pi) =>
+          part.startsWith('**') && part.endsWith('**') ? (
+            <strong key={pi}>{part.slice(2, -2)}</strong>
+          ) : (
+            <span key={pi}>{part}</span>
+          )
+        )}
+        {li < lines.length - 1 && <br />}
+      </span>
+    );
+  });
+}
+
 export default function AiAssistant() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([{ role: 'assistant', content: WELCOME }]);
@@ -43,14 +64,14 @@ export default function AiAssistant() {
               <span className="ai-avatar">✦</span>
               <div>
                 <strong>Citizen Desk Assistant</strong>
-                <span>Powered by OpenAI </span>
+                <span>Powered by OpenAI</span>
               </div>
             </div>
             <button type="button" className="ai-close" onClick={() => setOpen(false)} aria-label="Close assistant">✕</button>
           </div>
           <div className="ai-body">
             {messages.map((m, i) => (
-              <div key={i} className={`ai-bubble ${m.role}`}>{m.content}</div>
+              <div key={i} className={`ai-bubble ${m.role}`}>{formatMessage(m.content)}</div>
             ))}
             {loading && <div className="ai-bubble assistant ai-typing"><span></span><span></span><span></span></div>}
             {err && <div className="message error" style={{ margin: '4px 14px' }}>{err}</div>}
