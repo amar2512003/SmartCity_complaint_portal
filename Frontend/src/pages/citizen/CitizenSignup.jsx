@@ -56,7 +56,7 @@ export default function CitizenSignup() {
     <div className="auth-page">
       <section className="auth-visual">
         <Link className="brand" to="/citizen/login"><span className="brand-mark"><img src={brandMark} alt="" style={{width:22,height:22,objectFit:'contain'}}/></span><span>SmartCity</span></Link>
-        <div className="auth-copy"><span className="eyebrow">Built for better neighborhoods</span><h1>Speak up. Track it. See change.</h1><p>Create a simple account to report problems around your city and follow every update from submission to resolution.</p><div className="security-note"><span>✓</span><div><strong>Passwordless & secure</strong><small>We verify your email with a one-time code.</small></div></div><span style={{display:'inline-flex',alignItems:'center',gap:6,marginTop:16,fontSize:13,fontWeight:700,color:'rgba(255,255,255,.85)',position:'relative',zIndex:1}}>📍 Howrah Bridge, Kolkata</span></div>
+        <div className="auth-copy"><span className="eyebrow">Built for better neighborhoods</span><h1>Speak up. Track it. See change.</h1><p>Create a simple account to report problems around your city and follow every update from submission to resolution.</p><div className="security-note"><span>✓</span><div><strong>Passwordless & secure</strong><small>We verify your email with a one-time code.</small></div></div><span style={{display:'inline-flex',alignItems:'center',gap:6,marginTop:16,fontSize:13,fontWeight:700,color:'rgba(255,255,255,.85)',position:'relative',zIndex:1}}> Kolkata</span></div>
         <BridgeSketch/>
       </section>
       <section className="auth-form-side"><div className="auth-card">
