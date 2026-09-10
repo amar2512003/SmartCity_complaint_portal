@@ -43,7 +43,7 @@ export default function AiAssistant() {
               <span className="ai-avatar">✦</span>
               <div>
                 <strong>Citizen Desk Assistant</strong>
-                <span>Powered by Groq · answers may be imperfect</span>
+                <span>Powered by OpenAI </span>
               </div>
             </div>
             <button type="button" className="ai-close" onClick={() => setOpen(false)} aria-label="Close assistant">✕</button>
