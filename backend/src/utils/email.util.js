@@ -1,6 +1,7 @@
 import nodemailer from "nodemailer";
 import path from "path";
 import { fileURLToPath } from "url";
+import crypto from "crypto";
 
 function required(name) {
   const value = process.env[name];
@@ -22,23 +23,52 @@ const kolkataImagePath = path.join(
   "../assets/smartcity-kolkata.png"
 );
 
-export async function sendOtpEmail({ to, otp }) {
-  const transporter = nodemailer.createTransport({
+// Reuse a single transporter across calls instead of recreating one per email.
+// Re-authenticating on every send looks bursty to some providers and is just
+// slower; a shared, pooled connection is both faster and slightly better
+// for reputation.
+let transporter;
+function getTransporter() {
+  if (transporter) return transporter;
+  transporter = nodemailer.createTransport({
     host: required("SMTP_HOST"),
     port: Number(process.env.SMTP_PORT || 587),
     secure: process.env.SMTP_SECURE === "true",
-
+    pool: true,
     auth: {
       user: required("SMTP_USER"),
       pass: required("SMTP_PASS"),
     },
+    // If you send through your own domain's mail server (not a provider
+    // like SES/SendGrid/Resend that signs for you), you can DKIM-sign here.
+    // Requires a private key generated for a DNS selector you've published
+    // as a TXT record on your domain. Leave unset if your provider already
+    // signs outgoing mail (most transactional providers do this for you).
+    // dkim: {
+    //   domainName: 'yourdomain.com',
+    //   keySelector: 'default',
+    //   privateKey: required('DKIM_PRIVATE_KEY'),
+    // },
   });
+  return transporter;
+}
 
-  await transporter.sendMail({
-    from: `SmartCity Portal <${required("SMTP_USER")}>`,
+export async function sendOtpEmail({ to, otp }) {
+  const fromAddress = required("SMTP_USER");
+  // Recommended: SMTP_FROM should be a mailbox on a domain you control with
+  // SPF/DKIM/DMARC configured (see notes below). Falls back to SMTP_USER.
+  const senderAddress = process.env.SMTP_FROM || fromAddress;
+  const messageId = `<${crypto.randomUUID()}@${senderAddress.split("@")[1] || "smartcity-portal"}>`;
 
+  await getTransporter().sendMail({
+    from: `SmartCity Portal <${senderAddress}>`,
     to,
-
+    replyTo: senderAddress,
+    // Ties the envelope sender to the same domain as the header From —
+    // a mismatch here is one of the more common reasons a message that
+    // "looks fine" still gets spam-scored.
+    envelope: { from: senderAddress, to },
+    messageId,
     subject: `${otp} — Your SmartCity verification code`,
 
     text: `

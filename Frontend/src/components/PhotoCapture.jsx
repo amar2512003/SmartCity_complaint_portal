@@ -24,8 +24,12 @@ function buildAddress(a) {
 
 async function reverseGeocode(lat, lng) {
   try {
+    // accept-language=en is required here — without it, Nominatim can return
+    // locality names in the area's local script (e.g. Bengali) instead of
+    // Latin script, which silently breaks the municipal-body name matching
+    // in utils/municipalBody.js and misroutes the report.
     const res = await fetch(
-      `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&addressdetails=1&zoom=18`,
+      `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&addressdetails=1&zoom=18&accept-language=en`,
       { headers: { Accept: 'application/json' } }
     );
     if (!res.ok) return null;
@@ -233,8 +237,11 @@ export default function PhotoCapture({ value, onChange, onLocationChange, label 
             <div>
               <div>📍 {geo.address || coordLabel(geo.lat, geo.lng)}</div>
               <span>{coordLabel(geo.lat, geo.lng)} · ±{Math.round(geo.accuracy)}m · via OpenStreetMap</span>
-              {geo.muni?.municipalBody && (
+              {geo.muni?.municipalBody && geo.muni?.confidence !== 'district' && (
                 <div className="muni-line">🏛 Notify: <strong>{geo.muni.municipalBody}</strong></div>
+              )}
+              {geo.muni?.municipalBody && geo.muni?.confidence === 'district' && (
+                <div className="muni-line muni-warn">🏛 Notify: <strong>{geo.muni.municipalBody}</strong> (district-level match — please verify address)</div>
               )}
               {!geo.muni?.municipalBody && geo.muni?.options && (
                 <div className="muni-line muni-warn">🏛 {geo.muni.district} district — multiple bodies, please confirm: {geo.muni.options.join(', ')}</div>
