@@ -14,6 +14,7 @@ export default function CitizenSignup() {
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState('');
   const [err, setErr] = useState(false);
+  const [showSpamHint, setShowSpamHint] = useState(false);
   const { login } = useAuth();
 
   useEffect(() => {
@@ -28,6 +29,7 @@ export default function CitizenSignup() {
       await sendCitizenSignupOtp(form);
       setStep('otp'); setSeconds(600);
       setMsg(`We sent a 6-digit verification code to ${form.email}`);
+      setShowSpamHint(true);
     } catch (e) { setErr(true); setMsg(e.response?.data?.message || 'Unable to send OTP.'); }
     finally { setLoading(false); }
   };
@@ -44,7 +46,11 @@ export default function CitizenSignup() {
   const resend = async () => {
     if (seconds > 540) return;
     setMsg(''); setErr(false); setLoading(true);
-    try { await sendCitizenSignupOtp(form); setSeconds(600); setOtp(''); setMsg(`A new verification code was sent to ${form.email}`); }
+    try {
+      await sendCitizenSignupOtp(form); setSeconds(600); setOtp('');
+      setMsg(`A new verification code was sent to ${form.email}`);
+      setShowSpamHint(true);
+    }
     catch (e) { setErr(true); setMsg(e.response?.data?.message || 'Unable to resend OTP.'); }
     finally { setLoading(false); }
   };
@@ -54,6 +60,33 @@ export default function CitizenSignup() {
 
   return (
     <div className="auth-page">
+      {showSpamHint && (
+        <div className="spam-hint-overlay" onClick={() => setShowSpamHint(false)}>
+          <div className="spam-hint-popup" onClick={(e) => e.stopPropagation()}>
+            <button
+              className="spam-hint-close"
+              type="button"
+              aria-label="Close"
+              onClick={() => setShowSpamHint(false)}
+            >
+              ×
+            </button>
+            <h3>📩 Didn't get the code?</h3>
+            <p>
+              Please check your <strong>Spam</strong> or <strong>Promotions</strong> folder —
+              verification emails sometimes land there.
+            </p>
+            <button
+              className="primary-btn full"
+              type="button"
+              onClick={() => setShowSpamHint(false)}
+            >
+              Got it
+            </button>
+          </div>
+        </div>
+      )}
+
       <section className="auth-visual">
         <Link className="brand" to="/citizen/login"><span className="brand-mark"><img src={brandMark} alt="" style={{width:22,height:22,objectFit:'contain'}}/></span><span>SmartCity</span></Link>
         <div className="auth-copy"><span className="eyebrow">Built for better neighborhoods</span><h1>Speak up. Track it. See change.</h1><p>Create a simple account to report problems around your city and follow every update from submission to resolution.</p><div className="security-note"><span>✓</span><div><strong>Passwordless & secure</strong><small>We verify your email with a one-time code.</small></div></div><span style={{display:'inline-flex',alignItems:'center',gap:6,marginTop:16,fontSize:13,fontWeight:700,color:'rgba(255,255,255,.85)',position:'relative',zIndex:1}}> Kolkata</span></div>

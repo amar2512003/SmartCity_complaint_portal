@@ -1,6 +1,4 @@
 import nodemailer from "nodemailer";
-import path from "path";
-import { fileURLToPath } from "url";
 import crypto from "crypto";
 
 function required(name) {
@@ -13,16 +11,6 @@ function required(name) {
   return value;
 }
 
-// Get the current file's directory
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Kolkata artwork used in the email
-const kolkataImagePath = path.join(
-  __dirname,
-  "../assets/smartcity-kolkata.png"
-);
-
 // Reuse a single transporter across calls instead of recreating one per email.
 // Re-authenticating on every send looks bursty to some providers and is just
 // slower; a shared, pooled connection is both faster and slightly better
@@ -30,7 +18,8 @@ const kolkataImagePath = path.join(
 let transporter;
 function getTransporter() {
   if (transporter) return transporter;
-  transporter = nodemailer.createTransport({
+
+  const config = {
     host: required("SMTP_HOST"),
     port: Number(process.env.SMTP_PORT || 587),
     secure: process.env.SMTP_SECURE === "true",
@@ -39,26 +28,36 @@ function getTransporter() {
       user: required("SMTP_USER"),
       pass: required("SMTP_PASS"),
     },
-    // If you send through your own domain's mail server (not a provider
-    // like SES/SendGrid/Resend that signs for you), you can DKIM-sign here.
-    // Requires a private key generated for a DNS selector you've published
-    // as a TXT record on your domain. Leave unset if your provider already
-    // signs outgoing mail (most transactional providers do this for you).
-    // dkim: {
-    //   domainName: 'yourdomain.com',
-    //   keySelector: 'default',
-    //   privateKey: required('DKIM_PRIVATE_KEY'),
-    // },
-  });
+  };
+
+  // DKIM is the single biggest lever you have here. Without it, Gmail/Yahoo/
+  // Outlook score you as much more likely to be spoofed, which is enough on
+  // its own to route mail to spam regardless of content. Skip this block only
+  // if your provider (SES, SendGrid, Resend, Postmark, etc.) already signs
+  // outgoing mail for you — check their dashboard/docs to confirm before
+  // assuming you don't need it.
+  if (process.env.DKIM_PRIVATE_KEY) {
+    config.dkim = {
+      domainName: required("DKIM_DOMAIN"),
+      keySelector: process.env.DKIM_SELECTOR || "default",
+      privateKey: required("DKIM_PRIVATE_KEY"),
+    };
+  }
+
+  transporter = nodemailer.createTransport(config);
   return transporter;
 }
 
-export async function sendOtpEmail({ to, otp }) {
+export async function sendOtpEmail({ to, otp, name }) {
+  // Falls back to a neutral greeting if no name was captured at signup.
+  const firstName = (name || "").trim().split(/\s+/)[0] || "there";
+
   const fromAddress = required("SMTP_USER");
-  // Recommended: SMTP_FROM should be a mailbox on a domain you control with
-  // SPF/DKIM/DMARC configured (see notes below). Falls back to SMTP_USER.
+  // SMTP_FROM should be a mailbox on a domain you control with SPF/DKIM/DMARC
+  // configured in DNS. Falls back to SMTP_USER.
   const senderAddress = process.env.SMTP_FROM || fromAddress;
-  const messageId = `<${crypto.randomUUID()}@${senderAddress.split("@")[1] || "smartcity-portal"}>`;
+  const senderDomain = senderAddress.split("@")[1] || "smartcity-portal";
+  const messageId = `<${crypto.randomUUID()}@${senderDomain}>`;
 
   await getTransporter().sendMail({
     from: `SmartCity Portal <${senderAddress}>`,
@@ -71,14 +70,20 @@ export async function sendOtpEmail({ to, otp }) {
     messageId,
     subject: `${otp} — Your SmartCity verification code`,
 
+    // Gmail/Yahoo's bulk-sender rules increasingly weight the presence of a
+    // List-Unsubscribe header even for transactional mail. mailto: is enough
+    // here — it doesn't need to do anything meaningful for a pure OTP email,
+    // it just needs to exist.
+    headers: {
+      "List-Unsubscribe": `<mailto:${senderAddress}?subject=unsubscribe>`,
+      "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+    },
+
     text: `
 SmartCity Portal
-
 Your city. Your voice.
 
-Hi there,
-
-You're almost in.
+Hi ${firstName},
 
 Use the verification code below to continue with your SmartCity account:
 
@@ -94,25 +99,12 @@ SmartCity Portal
 Making civic services simpler, one report at a time.
     `,
 
-    attachments: [
-      {
-        filename: "smartcity-kolkata.png",
-        path: kolkataImagePath,
-        cid: "smartcity-kolkata",
-      },
-    ],
-
     html: `
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8" />
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  />
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SmartCity Verification</title>
 </head>
 
@@ -232,27 +224,6 @@ Making civic services simpler, one report at a time.
           </tr>
 
 
-          <!-- Kolkata Image -->
-          <tr>
-            <td style="padding:0;background:#e87512;">
-
-              <img
-                src="cid:smartcity-kolkata"
-                alt="Kolkata illustration"
-                width="600"
-                style="
-                  display:block;
-                  width:100%;
-                  max-width:600px;
-                  height:auto;
-                  border:0;
-                "
-              />
-
-            </td>
-          </tr>
-
-
           <!-- Content -->
           <tr>
             <td
@@ -295,7 +266,7 @@ Making civic services simpler, one report at a time.
                   line-height:1.7;
                 "
               >
-                You're almost there.
+                Hi ${firstName}, you're almost there.
                 Use the verification code below to continue
                 with your SmartCity account.
               </p>
@@ -395,10 +366,33 @@ Making civic services simpler, one report at a time.
                 </tr>
               </table>
 
+              <p
+                style="
+                  margin:0 0 4px;
+                  color:#333333;
+                  font-size:13px;
+                  font-weight:700;
+                "
+              >
+                Can't find this email?
+              </p>
 
               <p
                 style="
                   margin:0;
+                  color:#888888;
+                  font-size:12.5px;
+                  line-height:1.6;
+                "
+              >
+                Please check your Spam or Promotions folder — and consider
+                marking this address as "Not spam" so future codes arrive
+                in your inbox.
+              </p>
+
+              <p
+                style="
+                  margin:16px 0 0;
                   color:#888888;
                   font-size:13px;
                   line-height:1.6;

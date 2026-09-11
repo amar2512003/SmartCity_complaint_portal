@@ -19,7 +19,7 @@ async function createOtp(email, name, purpose) {
     expiresAt,
     purpose
   });
-  await sendOtpEmail({ to: email, otp });
+  await sendOtpEmail({ to: email, otp, name });
 }
 
 export async function sendSignupOtp(req, res) {
