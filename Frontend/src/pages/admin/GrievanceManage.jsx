@@ -1,1 +1,2 @@
-export default function GrievanceManage(){return <div className="card"><h1>Grievance Management</h1><p>Management controls are available on the admin dashboard.</p></div>}
+import {useTranslation} from 'react-i18next';
+export default function GrievanceManage(){const {t}=useTranslation('admin');return <div className="card"><h1>{t('grievanceManage.heading')}</h1><p>{t('grievanceManage.text')}</p></div>}

@@ -8,6 +8,8 @@ import admin from "./routes/admin.routes.js";
 import assistant from "./routes/assistant.routes.js";
 
 import { errorHandler } from "./middleware/error.middleware.js";
+import { resolveLocale } from "./middleware/locale.middleware.js";
+import { t } from "./i18n/index.js";
 import { env } from "./config/env.js";
 
 const app = express();
@@ -47,11 +49,16 @@ app.use(
 );
 
 app.use(express.json({ limit: "8mb" }));
+app.use(resolveLocale);
 
 app.get("/api/health", (req, res) =>
   res.json({
     success: true,
     message: "Smart City API is running",
+    // Sprint 1 smoke test: confirms X-App-Lang / Accept-Language resolution
+    // and the backend i18next instance are both wired correctly. Remove or
+    // repurpose once Sprint 3 lands real translated messages.
+    locale: { resolved: req.lang, sample: t("common:smoke_test", req.lang) },
   })
 );
 

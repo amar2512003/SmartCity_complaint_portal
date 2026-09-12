@@ -1,4 +1,4 @@
-# Samadhan
+# SmartCity Portal
 
 Simple React + Express + PostgreSQL smart-city grievance portal.
 

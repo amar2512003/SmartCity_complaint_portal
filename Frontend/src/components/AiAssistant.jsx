@@ -1,9 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { sendChatMessage } from '../api/assistant.api';
 import howrahBridge from '../assets/howrah-bridge.png';
-
-const WELCOME =
-  "Hi! I'm your Citizen Desk assistant. Ask me how to report an issue, which category to pick, or what a status like \"in progress\" means.";
 
 // Turns **bold** markers and line breaks into real React elements.
 // Deliberately minimal (no markdown lib) — just enough for the assistant's replies.
@@ -29,9 +27,10 @@ function formatMessage(text) {
 }
 
 export default function AiAssistant() {
+  const { t, i18n } = useTranslation('citizen');
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { role: 'assistant', content: WELCOME },
+    { role: 'assistant', content: t('assistant.welcome') },
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -43,6 +42,19 @@ export default function AiAssistant() {
       bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages, open, loading]);
+
+  // If the conversation is still just the untouched welcome message, keep it
+  // in sync when the citizen switches language via the toggle. Once the
+  // citizen has actually chatted, we leave prior turns alone rather than
+  // rewriting message history underneath them.
+  useEffect(() => {
+    setMessages((m) =>
+      m.length === 1 && m[0].role === 'assistant'
+        ? [{ role: 'assistant', content: t('assistant.welcome') }]
+        : m
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [i18n.resolvedLanguage]);
 
   const send = async (e) => {
     e.preventDefault();
@@ -62,7 +74,7 @@ export default function AiAssistant() {
     setLoading(true);
 
     try {
-      const r = await sendChatMessage(next.slice(-12));
+      const r = await sendChatMessage(next.slice(-12), i18n.resolvedLanguage);
 
       setMessages((m) => [
         ...m,
@@ -73,8 +85,7 @@ export default function AiAssistant() {
       ]);
     } catch (e) {
       setErr(
-        e.response?.data?.message ||
-          "Couldn't reach the assistant. Please try again."
+        e.response?.data?.message || t('assistant.connectionError')
       );
     } finally {
       setLoading(false);
@@ -92,14 +103,14 @@ export default function AiAssistant() {
               <span className="ai-avatar">
                 <img
                   src={howrahBridge}
-                  alt="Howrah Bridge"
+                  alt={t('assistant.howrahBridgeAlt')}
                   className="assistant-icon-image"
                 />
               </span>
 
               <div>
-                <strong>Citizen Desk Assistant</strong>
-                <span>Powered by OpenAI</span>
+                <strong>{t('assistant.title')}</strong>
+                <span>{t('assistant.poweredBy')}</span>
               </div>
             </div>
 
@@ -107,7 +118,7 @@ export default function AiAssistant() {
               type="button"
               className="ai-close"
               onClick={() => setOpen(false)}
-              aria-label="Close assistant"
+              aria-label={t('assistant.closePanelAria')}
             >
               ✕
             </button>
@@ -148,7 +159,7 @@ export default function AiAssistant() {
             onSubmit={send}
           >
             <input
-              placeholder="Ask about reporting an issue…"
+              placeholder={t('assistant.inputPlaceholder')}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               disabled={loading}
@@ -159,7 +170,7 @@ export default function AiAssistant() {
               className="primary-btn"
               disabled={loading || !input.trim()}
             >
-              Send
+              {t('assistant.send')}
             </button>
           </form>
         </div>
@@ -172,8 +183,8 @@ export default function AiAssistant() {
         onClick={() => setOpen((o) => !o)}
         aria-label={
           open
-            ? 'Close AI assistant'
-            : 'Open AI assistant'
+            ? t('assistant.closeFabAria')
+            : t('assistant.openFabAria')
         }
       >
         {open ? '✕' : '✦'}

@@ -6,10 +6,6 @@ node_modules/
 .env.local
 .env.*.local
 
-# Build output
-dist/
-build/
-
 # Logs
 logs/
 *.log
@@ -23,5 +19,6 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Vite cache
-.vite/
+# Build output (if any)
+dist/
+build/

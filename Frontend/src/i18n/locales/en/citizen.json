@@ -1,0 +1,188 @@
+{
+  "brand": {
+    "tagline": "Your city. Your voice.",
+    "city": "Kolkata"
+  },
+  "otp": {
+    "emailLabel": "Email address",
+    "sendingCode": "Sending code…",
+    "otpSentTo": "We sent a 6-digit verification code to {{email}}",
+    "otpResentTo": "A new verification code was sent to {{email}}",
+    "unableToSendOtp": "Unable to send OTP.",
+    "unableToVerifyOtp": "Unable to verify OTP.",
+    "unableToResendOtp": "Unable to resend OTP.",
+    "checkInbox": "Check your inbox",
+    "verificationCodeLabel": "Verification code",
+    "codeExpiresIn": "Code expires in {{time}}",
+    "codeExpired": "Code expired",
+    "resendCode": "Resend code",
+    "verifying": "Verifying…",
+    "changeEmail": "← Change email"
+  },
+  "login": {
+    "heading": "Make your neighborhood better.",
+    "intro": "Report civic issues, follow progress, and stay connected with the people improving your city.",
+    "welcomeBack": "Welcome back",
+    "emailStepSubtitle": "Enter your email and we'll send a secure one-time code. No password required.",
+    "sendOtp": "Send OTP",
+    "stepEmailEntered": "Email entered",
+    "stepVerify": "Verify",
+    "otpSubtitlePrefix": "Enter the 6-digit code sent to",
+    "signIn": "Sign in",
+    "newToSmartCity": "New to SmartCity?",
+    "createAccount": "Create a citizen account",
+    "staffMember": "Staff member?",
+    "adminSignIn": "Admin sign in"
+  },
+  "signup": {
+    "eyebrow": "Built for better neighborhoods",
+    "heading": "Speak up. Track it. See change.",
+    "intro": "Create a simple account to report problems around your city and follow every update from submission to resolution.",
+    "secureTitle": "Passwordless & secure",
+    "secureSubtitle": "We verify your email with a one-time code.",
+    "stepAccountDetails": "Account details",
+    "stepVerifyEmail": "Verify email",
+    "createYourAccount": "Create your account",
+    "detailsSubtitle": "No password needed. We'll send a one-time code to verify your email.",
+    "fullNameLabel": "Full name",
+    "fullNamePlaceholder": "Your name",
+    "verifyEmailCta": "Verify email",
+    "otpSubtitlePrefix": "Enter the 6-digit code we sent to",
+    "verifyAndCreate": "Verify & create account",
+    "alreadyHaveAccount": "Already have an account?",
+    "signIn": "Sign in",
+    "spamHint": {
+      "title": "📩 Didn't get the code?",
+      "prefix": "Please check your",
+      "spam": "Spam",
+      "or": "or",
+      "promotions": "Promotions",
+      "suffix": "folder — verification emails sometimes land there.",
+      "gotIt": "Got it"
+    }
+  },
+  "nav": {
+    "dashboard": "My Dashboard",
+    "reportIssue": "Report an Issue",
+    "signOut": "Sign out"
+  },
+  "dashboard": {
+    "eyebrow": "Citizen dashboard",
+    "subtitle": "Here’s the latest on the issues you’ve reported.",
+    "refresh": "Refresh",
+    "reportIssue": "Report an issue",
+    "stats": {
+      "pending": "Pending",
+      "inProgress": "In progress",
+      "resolved": "Resolved"
+    },
+    "tableHeading": "Your grievances",
+    "reportCount_one": "{{count}} report submitted",
+    "reportCount_other": "{{count}} reports submitted",
+    "liveStatus": "Live status",
+    "loadError": "Could not load your grievances.",
+    "empty": {
+      "title": "No grievances yet",
+      "text": "When you report a civic issue, it will appear here.",
+      "cta": "Report your first issue"
+    },
+    "table": {
+      "photo": "Photo",
+      "issue": "Issue",
+      "category": "Category",
+      "location": "Location",
+      "routedTo": "Routed to",
+      "status": "Status"
+    }
+  },
+  "grievanceForm": {
+    "eyebrow": "CIVIC REPORT",
+    "headingLine1": "Help make",
+    "headingLine2Prefix": "your city ",
+    "headingHighlight": "better.",
+    "introText": "Report a civic issue with enough detail for the concerned team to understand and act quickly.",
+    "features": {
+      "photo": {
+        "title": "Photo evidence",
+        "text": "Show the issue exactly as you found it."
+      },
+      "location": {
+        "title": "Precise location",
+        "text": "Your location helps identify the exact spot."
+      },
+      "routing": {
+        "title": "Smart routing",
+        "text": "Your report is routed to the relevant authority."
+      }
+    },
+    "formStep": "REPORT DETAILS",
+    "formHeading": "Tell us what happened",
+    "formSubtitle": "Add the issue details below.",
+    "fields": {
+      "titleLabel": "Issue title",
+      "titlePlaceholder": "e.g. Pothole on Main Road",
+      "categoryLabel": "Category",
+      "descriptionLabel": "Description",
+      "descriptionHint": "Be specific",
+      "descriptionPlaceholder": "Describe what happened, where it is, and anything else the city team should know..."
+    },
+    "locationConfirmed": {
+      "title": "Location captured",
+      "text": "Your report will include the exact location and municipal routing information."
+    },
+    "cancel": "Cancel",
+    "submitting": "Submitting…",
+    "submit": "Submit report",
+    "errors": {
+      "photoRequired": "Please add a photo of the issue before submitting.",
+      "submitFailed": "Could not submit the grievance."
+    },
+    "success": "Your grievance was submitted successfully."
+  },
+  "grievanceDetail": {
+    "reportNumber": "Report #{{id}}",
+    "heading": "Grievance details",
+    "comingSoon": "Detailed view coming soon",
+    "comingSoonText": "You can already track this report's status, photo, location, and routing from the main dashboard.",
+    "backToDashboard": "← Back to dashboard"
+  },
+  "photoCapture": {
+    "label": "Photo evidence",
+    "retake": "Retake",
+    "remove": "Remove",
+    "dropzoneTitle": "Add a photo of the issue",
+    "dropzoneText": "A picture helps the city team understand and act faster.",
+    "clickPicture": "Click a picture",
+    "cameraUnavailable": "Camera unavailable. You can upload a picture instead.",
+    "gettingLocation": "Getting your location…",
+    "geoSummary": "{{coord}} · ±{{accuracy}}m · via OpenStreetMap",
+    "capturedEvidenceAlt": "Captured evidence",
+    "notify": "Notify:",
+    "districtLevelNote": "(district-level match — please verify address)",
+    "multipleBodies": "{{district}} district — multiple bodies, please confirm: {{options}}",
+    "outsideState": "Outside West Bengal — municipal body not applicable",
+    "notIdentified": "Municipal body could not be identified for this location",
+    "locationErrorPrefix": "Couldn't get your location.",
+    "tryAgain": "Try again",
+    "closeCameraAria": "Close camera",
+    "choosePhoto": "Choose a photo",
+    "startingCamera": "Starting camera…",
+    "locatingShort": "Locating…",
+    "addressFound": "Address found",
+    "locationUnavailable": "Location unavailable",
+    "switchCamera": "Switch camera",
+    "capturePhotoAria": "Capture photo"
+  },
+  "assistant": {
+    "title": "Citizen Desk Assistant",
+    "poweredBy": "Powered by OpenAI",
+    "howrahBridgeAlt": "Howrah Bridge",
+    "welcome": "Hi! I'm your Citizen Desk assistant. Ask me how to report an issue, which category to pick, or what a status like \"in progress\" means.",
+    "closePanelAria": "Close assistant",
+    "inputPlaceholder": "Ask about reporting an issue…",
+    "send": "Send",
+    "connectionError": "Couldn't reach the assistant. Please try again.",
+    "openFabAria": "Open AI assistant",
+    "closeFabAria": "Close AI assistant"
+  }
+}

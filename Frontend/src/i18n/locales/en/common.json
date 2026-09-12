@@ -1,0 +1,41 @@
+{
+  "app": {
+    "name": "SmartCity Portal"
+  },
+  "language": {
+    "en": "English",
+    "bn": "বাংলা"
+  },
+  "categories": {
+    "Road": "Road",
+    "Water": "Water",
+    "Drainage / Waterlogging": "Drainage / Waterlogging",
+    "Sewage": "Sewage",
+    "Garbage": "Garbage",
+    "Sanitation / Public Toilet": "Sanitation / Public Toilet",
+    "Street Light": "Street Light",
+    "Traffic & Parking": "Traffic & Parking",
+    "Stray Animals": "Stray Animals",
+    "Illegal Construction / Encroachment": "Illegal Construction / Encroachment",
+    "Fallen Tree / Storm Damage": "Fallen Tree / Storm Damage",
+    "Public Property Damage": "Public Property Damage",
+    "Mosquito Breeding / Pest Control": "Mosquito Breeding / Pest Control",
+    "Noise Pollution": "Noise Pollution",
+    "Other": "Other"
+  },
+  "statuses": {
+    "pending": "Pending",
+    "in_progress": "In progress",
+    "resolved": "Resolved",
+    "rejected": "Rejected"
+  },
+  "shared": {
+    "builtBy": "Built by",
+    "viewOnMaps": "View on Google Maps",
+    "districtSuffix": "{{district}} district",
+    "districtVerifyTooltip": "Multiple bodies in this district — verify from the address/photo",
+    "districtVerify": "{{district}} — verify",
+    "close": "Close",
+    "reportedIssuePhoto": "Reported issue photo"
+  }
+}

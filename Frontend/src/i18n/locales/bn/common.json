@@ -1,0 +1,41 @@
+{
+  "app": {
+    "name": "স্মার্টসিটি পোর্টাল"
+  },
+  "language": {
+    "en": "English",
+    "bn": "বাংলা"
+  },
+  "categories": {
+    "Road": "রাস্তা",
+    "Water": "জল",
+    "Drainage / Waterlogging": "নিকাশি / জল জমা",
+    "Sewage": "নর্দমা",
+    "Garbage": "আবর্জনা",
+    "Sanitation / Public Toilet": "স্যানিটেশন / সর্বজনীন শৌচাগার",
+    "Street Light": "রাস্তার আলো",
+    "Traffic & Parking": "ট্রাফিক ও পার্কিং",
+    "Stray Animals": "বেওয়ারিশ পশু",
+    "Illegal Construction / Encroachment": "অবৈধ নির্মাণ / দখল",
+    "Fallen Tree / Storm Damage": "পতিত গাছ / ঝড়ের ক্ষতি",
+    "Public Property Damage": "সরকারি সম্পত্তির ক্ষতি",
+    "Mosquito Breeding / Pest Control": "মশার প্রজনন / কীটপতঙ্গ নিয়ন্ত্রণ",
+    "Noise Pollution": "শব্দদূষণ",
+    "Other": "অন্যান্য"
+  },
+  "statuses": {
+    "pending": "অপেক্ষমাণ",
+    "in_progress": "চলমান",
+    "resolved": "সমাধান হয়েছে",
+    "rejected": "প্রত্যাখ্যাত"
+  },
+  "shared": {
+    "builtBy": "তৈরি করেছেন",
+    "viewOnMaps": "গুগল ম্যাপে দেখুন",
+    "districtSuffix": "{{district}} জেলা",
+    "districtVerifyTooltip": "এই জেলায় একাধিক সংস্থা রয়েছে — ঠিকানা/ছবি থেকে যাচাই করুন",
+    "districtVerify": "{{district}} — যাচাই করুন",
+    "close": "বন্ধ করুন",
+    "reportedIssuePhoto": "রিপোর্ট করা সমস্যার ছবি"
+  }
+}

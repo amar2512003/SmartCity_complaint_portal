@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { assignMunicipalBody } from '../utils/municipalBody';
 
 function formatCoord(n) { return Math.abs(n).toFixed(5) + '°'; }
@@ -67,6 +68,9 @@ function wrapText(ctx, text, maxWidth, maxLines) {
 
 // Resize + compress a source (video frame or image) onto a canvas, optionally burning a
 // geotag stamp (address / coordinates + timestamp) into the bottom of the frame.
+// Note: this stamp is burned into the photo's pixels and is intentionally kept in the
+// request's language via the `geo.timestamp` string already formatted by the caller (locate());
+// the "via OpenStreetMap" style copy shown on-screen (not stamped) is translated separately below.
 function toStampedDataUrl(source, sw, sh, geo, maxWidth = 1024, quality = 0.75) {
   const scale = Math.min(1, maxWidth / sw);
   const w = Math.round(sw * scale), h = Math.round(sh * scale);
@@ -119,7 +123,10 @@ function toStampedDataUrl(source, sw, sh, geo, maxWidth = 1024, quality = 0.75) 
   return canvas.toDataURL('image/jpeg', quality);
 }
 
-export default function PhotoCapture({ value, onChange, onLocationChange, label = 'Photo evidence', required = false }) {
+export default function PhotoCapture({ value, onChange, onLocationChange, label, required = false }) {
+  const { t } = useTranslation('citizen');
+  const displayLabel = label ?? t('photoCapture.label');
+
   const [open, setOpen] = useState(false);
   const [stream, setStream] = useState(null);
   const [facing, setFacing] = useState('environment');
@@ -172,7 +179,7 @@ export default function PhotoCapture({ value, onChange, onLocationChange, label 
       setStream(s); setFacing(mode);
       if (videoRef.current) { videoRef.current.srcObject = s; await videoRef.current.play(); }
     } catch (e) {
-      setCamError('Camera unavailable. You can upload a picture instead.');
+      setCamError(t('photoCapture.cameraUnavailable'));
     } finally { setStarting(false); }
   };
 
@@ -209,22 +216,22 @@ export default function PhotoCapture({ value, onChange, onLocationChange, label 
 
   return (
     <div className="photo-capture">
-      <label>{label}{required && <span className="required-mark"> *</span>}</label>
+      <label>{displayLabel}{required && <span className="required-mark"> *</span>}</label>
       {value ? (
         <div className="photo-preview">
-          <img src={value} alt="Captured evidence" />
+          <img src={value} alt={t('photoCapture.capturedEvidenceAlt')} />
           <div className="photo-preview-actions">
-            <button type="button" className="ghost-btn" onClick={openCamera}>↻ Retake</button>
-            <button type="button" className="ghost-btn danger-ghost" onClick={() => { onChange(''); setGeo(null); setGeoStatus('idle'); onLocationChange?.(null); }}>✕ Remove</button>
+            <button type="button" className="ghost-btn" onClick={openCamera}>↻ {t('photoCapture.retake')}</button>
+            <button type="button" className="ghost-btn danger-ghost" onClick={() => { onChange(''); setGeo(null); setGeoStatus('idle'); onLocationChange?.(null); }}>✕ {t('photoCapture.remove')}</button>
           </div>
         </div>
       ) : (
         <div className="photo-dropzone">
           <div className="photo-dropzone-icon">📷</div>
-          <strong>Add a photo of the issue</strong>
-          <p>A picture helps the city team understand and act faster.</p>
+          <strong>{t('photoCapture.dropzoneTitle')}</strong>
+          <p>{t('photoCapture.dropzoneText')}</p>
           <div className="photo-dropzone-actions">
-            <button type="button" className="primary-btn" onClick={openCamera}>📸 Click a picture</button>
+            <button type="button" className="primary-btn" onClick={openCamera}>📸 {t('photoCapture.clickPicture')}</button>
           </div>
           <input ref={fileInputRef} type="file" accept="image/*" capture="environment" hidden onChange={onFile} />
         </div>
@@ -232,58 +239,58 @@ export default function PhotoCapture({ value, onChange, onLocationChange, label 
 
       {value && geoStatus !== 'idle' && (
         <div className={`geo-badge geo-${geoStatus}`}>
-          {geoStatus === 'locating' && <>📡 Getting your location…</>}
+          {geoStatus === 'locating' && <>📡 {t('photoCapture.gettingLocation')}</>}
           {geoStatus === 'ready' && geo && (
             <div>
               <div>📍 {geo.address || coordLabel(geo.lat, geo.lng)}</div>
-              <span>{coordLabel(geo.lat, geo.lng)} · ±{Math.round(geo.accuracy)}m · via OpenStreetMap</span>
+              <span>{t('photoCapture.geoSummary', { coord: coordLabel(geo.lat, geo.lng), accuracy: Math.round(geo.accuracy) })}</span>
               {geo.muni?.municipalBody && geo.muni?.confidence !== 'district' && (
-                <div className="muni-line">🏛 Notify: <strong>{geo.muni.municipalBody}</strong></div>
+                <div className="muni-line">🏛 {t('photoCapture.notify')} <strong>{geo.muni.municipalBody}</strong></div>
               )}
               {geo.muni?.municipalBody && geo.muni?.confidence === 'district' && (
-                <div className="muni-line muni-warn">🏛 Notify: <strong>{geo.muni.municipalBody}</strong> (district-level match — please verify address)</div>
+                <div className="muni-line muni-warn">🏛 {t('photoCapture.notify')} <strong>{geo.muni.municipalBody}</strong> {t('photoCapture.districtLevelNote')}</div>
               )}
               {!geo.muni?.municipalBody && geo.muni?.options && (
-                <div className="muni-line muni-warn">🏛 {geo.muni.district} district — multiple bodies, please confirm: {geo.muni.options.join(', ')}</div>
+                <div className="muni-line muni-warn">🏛 {t('photoCapture.multipleBodies', { district: geo.muni.district, options: geo.muni.options.join(', ') })}</div>
               )}
               {!geo.muni?.municipalBody && !geo.muni?.options && geo.muni?.confidence === 'out-of-state' && (
-                <div className="muni-line muni-warn">🏛 Outside West Bengal — municipal body not applicable</div>
+                <div className="muni-line muni-warn">🏛 {t('photoCapture.outsideState')}</div>
               )}
               {!geo.muni?.municipalBody && !geo.muni?.options && geo.muni?.confidence === 'none' && (
-                <div className="muni-line muni-warn">🏛 Municipal body could not be identified for this location</div>
+                <div className="muni-line muni-warn">🏛 {t('photoCapture.notIdentified')}</div>
               )}
             </div>
           )}
-          {geoStatus === 'error' && <>⚠ Couldn't get your location. <button type="button" className="text-btn" onClick={locate}>Try again</button></>}
+          {geoStatus === 'error' && <>⚠ {t('photoCapture.locationErrorPrefix')} <button type="button" className="text-btn" onClick={locate}>{t('photoCapture.tryAgain')}</button></>}
         </div>
       )}
 
       {open && (
         <div className="camera-modal" role="dialog" aria-modal="true">
           <div className="camera-modal-inner">
-            <button type="button" className="camera-close" onClick={closeCamera} aria-label="Close camera">✕</button>
+            <button type="button" className="camera-close" onClick={closeCamera} aria-label={t('photoCapture.closeCameraAria')}>✕</button>
             <div className="camera-stage">
               {camError ? (
                 <div className="camera-fallback">
                   <p>{camError}</p>
-                  <button type="button" className="primary-btn" onClick={() => fileInputRef.current?.click()}>Choose a photo</button>
+                  <button type="button" className="primary-btn" onClick={() => fileInputRef.current?.click()}>{t('photoCapture.choosePhoto')}</button>
                 </div>
               ) : (
                 <>
                   <video ref={videoRef} className="camera-video" playsInline muted />
-                  {starting && <div className="camera-loading">Starting camera…</div>}
+                  {starting && <div className="camera-loading">{t('photoCapture.startingCamera')}</div>}
                   <div className={`geo-pill geo-${geoStatus}`}>
-                    {geoStatus === 'locating' && '📡 Locating…'}
-                    {geoStatus === 'ready' && '📍 Address found'}
-                    {geoStatus === 'error' && '⚠ Location unavailable'}
+                    {geoStatus === 'locating' && `📡 ${t('photoCapture.locatingShort')}`}
+                    {geoStatus === 'ready' && `📍 ${t('photoCapture.addressFound')}`}
+                    {geoStatus === 'error' && `⚠ ${t('photoCapture.locationUnavailable')}`}
                   </div>
                 </>
               )}
             </div>
             {!camError && (
               <div className="camera-controls">
-                <button type="button" className="camera-flip" onClick={flipCamera} title="Switch camera">⟳</button>
-                <button type="button" className="shutter-btn" onClick={capture} aria-label="Capture photo" />
+                <button type="button" className="camera-flip" onClick={flipCamera} title={t('photoCapture.switchCamera')}>⟳</button>
+                <button type="button" className="shutter-btn" onClick={capture} aria-label={t('photoCapture.capturePhotoAria')} />
                 <span className="camera-flip-spacer" />
               </div>
             )}

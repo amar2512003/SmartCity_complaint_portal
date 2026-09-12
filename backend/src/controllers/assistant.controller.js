@@ -1,9 +1,10 @@
 import { env } from '../config/env.js';
 import { fail } from '../utils/apiResponse.util.js';
+import { t } from '../i18n/index.js';
 
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
-const SYSTEM_PROMPT = `You are the SmartCity Citizen Desk Assistant, a helpful guide embedded in a civic grievance portal.
+const BASE_SYSTEM_PROMPT = `You are the SmartCity Citizen Desk Assistant, a helpful guide embedded in a civic grievance portal.
 You help citizens:
 - Understand how to report a civic issue (title, category, description, optional photo and location).
 - Pick the right category: Road, Water, Garbage, Street Light, or Other.
@@ -16,6 +17,18 @@ Keep replies short, friendly, and practical (usually under 120 words) unless the
 
 If a question is unrelated to the SmartCity portal, do not answer it. Politely state that you can only help with the SmartCity portal and its grievance services.`;
 
+// The off-topic guardrail message and error/unavailable strings bypass the
+// LLM entirely (see below), so they're translated via the shared t() helper
+// like every other API response. The LLM's own replies are steered by this
+// explicit instruction line instead, appended to the system prompt.
+const LANGUAGE_INSTRUCTION = {
+  en: 'Respond in English.',
+  bn: 'Respond in Bengali (বাংলা), using the Bengali script for your entire reply.',
+};
+
+function buildSystemPrompt(lang) {
+  return `${BASE_SYSTEM_PROMPT}\n\n${LANGUAGE_INSTRUCTION[lang] || LANGUAGE_INSTRUCTION.en}`;
+}
 
 // Simple guardrail to allow only SmartCity-related questions
 const SMARTCITY_KEYWORDS = [
@@ -52,33 +65,46 @@ function isSmartCityQuery(message) {
   return SMARTCITY_KEYWORDS.some((keyword) => text.includes(keyword));
 }
 
+// `req.body.lang` (sent explicitly by AiAssistant.jsx alongside the chat
+// payload) takes priority since it reflects the exact UI language at the
+// moment of sending; falls back to req.lang (resolved by locale.middleware.js
+// from the X-App-Lang header) if absent or invalid.
+function resolveChatLang(req) {
+  const bodyLang = (req.body?.lang || '').toLowerCase();
+  if (bodyLang === 'en' || bodyLang === 'bn') return bodyLang;
+  return req.lang || 'en';
+}
 
 export async function chat(req, res) {
+  const lang = resolveChatLang(req);
+
   try {
     if (!env.groqApiKey) {
-      return fail(
-        res,
-        'AI assistant is not configured. Ask the administrator to set GROQ_API_KEY.',
-        503
-      );
+      return fail(res, t('assistant:not_configured', lang), 503);
     }
 
     const { messages } = req.body;
 
     if (!Array.isArray(messages) || messages.length === 0) {
-      return fail(res, 'messages array is required', 422);
+      return fail(res, t('assistant:messages_required', lang), 422);
     }
 
-    // Guardrail: check only the latest user message
+    // Guardrail: only gate the *first* message of a session with the strict
+    // keyword check. Gating every message was rejecting normal conversational
+    // follow-ups ("does that make sense?", "how long does it take?") that
+    // don't happen to repeat a keyword, even mid-conversation about the
+    // portal — which made the assistant look broken. Once a session is
+    // underway, the system prompt's own off-topic instruction (line 18)
+    // is enough to keep replies on-topic.
     const latestMessage = messages[messages.length - 1]?.content || '';
+    const isFirstMessage = messages.length === 1;
 
-    if (!isSmartCityQuery(latestMessage)) {
+    if (isFirstMessage && !isSmartCityQuery(latestMessage)) {
       return res.json({
         success: true,
         message: 'Success',
         data: {
-          reply:
-            "I'm here to help with the SmartCity portal and civic grievance services. I can help you submit a grievance, track a complaint, understand categories, location capture, routing, or other SmartCity features.",
+          reply: t('assistant:off_topic_reply', lang),
         },
       });
     }
@@ -98,7 +124,7 @@ export async function chat(req, res) {
       body: JSON.stringify({
         model: env.groqModel,
         messages: [
-          { role: 'system', content: SYSTEM_PROMPT },
+          { role: 'system', content: buildSystemPrompt(lang) },
           ...trimmed,
         ],
         temperature: 0.5,
@@ -110,11 +136,7 @@ export async function chat(req, res) {
       const detail = await groqRes.text().catch(() => '');
       console.error('Groq API error:', groqRes.status, detail);
 
-      return fail(
-        res,
-        'The AI assistant is unavailable right now. Please try again shortly.',
-        502
-      );
+      return fail(res, t('assistant:unavailable', lang), 502);
     }
 
     const data = await groqRes.json();
@@ -122,11 +144,7 @@ export async function chat(req, res) {
     const reply = data?.choices?.[0]?.message?.content?.trim();
 
     if (!reply) {
-      return fail(
-        res,
-        'The AI assistant returned an empty response.',
-        502
-      );
+      return fail(res, t('assistant:empty_response', lang), 502);
     }
 
     return res.json({
@@ -137,10 +155,6 @@ export async function chat(req, res) {
   } catch (e) {
     console.error('Assistant chat error:', e);
 
-    return fail(
-      res,
-      'Could not reach the AI assistant.',
-      500
-    );
+    return fail(res, t('assistant:unreachable', lang), 500);
   }
 }

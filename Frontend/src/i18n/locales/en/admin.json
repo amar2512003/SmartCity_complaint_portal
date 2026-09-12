@@ -1,0 +1,58 @@
+{
+  "login": {
+    "eyebrow": "Operations center",
+    "heading": "Keep the city moving.",
+    "intro": "Review incoming civic reports, prioritize work, and keep residents informed as issues move toward resolution.",
+    "signIn": "Admin sign in",
+    "subtitle": "Access the grievance operations dashboard.",
+    "demoLabel": "Demo access",
+    "emailLabel": "Email address",
+    "passwordLabel": "Password",
+    "openDashboard": "Open dashboard",
+    "unableToSignIn": "Unable to sign in.",
+    "backToCitizenPortal": "← Back to citizen portal"
+  },
+  "nav": {
+    "badge": "ADMIN",
+    "grievanceDesk": "Grievance Desk",
+    "administrator": "Administrator",
+    "signOut": "Sign out"
+  },
+  "dashboard": {
+    "heading": "Grievance desk",
+    "subtitle": "Review and move citizen reports through the resolution workflow.",
+    "operationsOnline": "Operations online",
+    "stats": {
+      "pending": "Awaiting review",
+      "inProgress": "Being handled",
+      "resolved": "Resolved"
+    },
+    "tableHeading": "Citizen reports",
+    "reportCount_one": "{{count}} total grievance",
+    "reportCount_other": "{{count}} total grievances",
+    "allDistricts": "All Districts",
+    "refresh": "Refresh",
+    "loadError": "Could not load grievances.",
+    "updateError": "Could not update status.",
+    "empty": {
+      "title": "No reports found",
+      "textAll": "New citizen grievances will appear here.",
+      "textFiltered": "No grievances found for {{district}} district."
+    },
+    "table": {
+      "photo": "Photo",
+      "id": "ID",
+      "citizen": "Citizen",
+      "issue": "Issue",
+      "category": "Category",
+      "location": "Location",
+      "notify": "Notify",
+      "status": "Status",
+      "update": "Update"
+    }
+  },
+  "grievanceManage": {
+    "heading": "Grievance Management",
+    "text": "Management controls are available on the admin dashboard."
+  }
+}

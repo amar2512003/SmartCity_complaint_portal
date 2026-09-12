@@ -1,9 +1,28 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { createGrievance } from '../../api/grievance.api';
 import Message from '../../components/Message';
 import PhotoCapture from '../../components/PhotoCapture';
 import victoriaMemorial from '../../assets/victoria-memorial.png';
+
+const CATEGORY_VALUES = [
+  'Road',
+  'Water',
+  'Drainage / Waterlogging',
+  'Sewage',
+  'Garbage',
+  'Sanitation / Public Toilet',
+  'Street Light',
+  'Traffic & Parking',
+  'Stray Animals',
+  'Illegal Construction / Encroachment',
+  'Fallen Tree / Storm Damage',
+  'Public Property Damage',
+  'Mosquito Breeding / Pest Control',
+  'Noise Pollution',
+  'Other',
+];
 
 function ordinalSuffix(day) {
   if (day > 3 && day < 21) return 'th';
@@ -15,22 +34,32 @@ function ordinalSuffix(day) {
   }
 }
 
-function formatReportDate(date) {
+// Date/time badge is shown in the active UI language: Bengali locale gives
+// Bengali weekday/month names (and Bengali numerals) via Intl; English keeps
+// the original "25th Sep '26" ordinal-day style, which has no clean Bengali
+// equivalent.
+function formatReportDate(date, lang) {
+  if (lang === 'bn') {
+    return date.toLocaleDateString('bn-IN', { day: 'numeric', month: 'short', year: '2-digit' });
+  }
   const day = date.getDate();
   const month = date.toLocaleString('en-US', { month: 'short' });
   const year = String(date.getFullYear()).slice(-2);
   return `${day}${ordinalSuffix(day)} ${month} '${year}`;
 }
 
-function formatReportTime(date) {
-  return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+function formatReportTime(date, lang) {
+  return date.toLocaleTimeString(lang === 'bn' ? 'bn-IN' : 'en-US', { hour: 'numeric', minute: '2-digit' });
 }
 
-function formatDayLabel(date) {
-  return date.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
+function formatDayLabel(date, lang) {
+  return date.toLocaleDateString(lang === 'bn' ? 'bn-IN' : 'en-US', { weekday: 'short' }).toUpperCase();
 }
 
 export default function NewGrievance() {
+  const { t, i18n } = useTranslation(['citizen', 'common']);
+  const lang = i18n.resolvedLanguage || 'en';
+
   const [f, setF] = useState({
     title: '',
     category: 'Road',
@@ -58,7 +87,7 @@ export default function NewGrievance() {
 
     if (!photo) {
       setErr(true);
-      setMsg('Please add a photo of the issue before submitting.');
+      setMsg(t('grievanceForm.errors.photoRequired'));
       return;
     }
 
@@ -72,14 +101,14 @@ export default function NewGrievance() {
         ...(loc || {}),
       });
 
-      setMsg('Your grievance was submitted successfully.');
+      setMsg(t('grievanceForm.success'));
 
       setTimeout(() => nav('/dashboard'), 700);
     } catch (e) {
       setErr(true);
       setMsg(
         e.response?.data?.message ||
-          'Could not submit the grievance.'
+          t('grievanceForm.errors.submitFailed')
       );
     } finally {
       setLoading(false);
@@ -95,18 +124,17 @@ export default function NewGrievance() {
         <aside className="grievance-intro">
 
           <span className="eyebrow">
-            CIVIC REPORT
+            {t('grievanceForm.eyebrow')}
           </span>
 
           <h1>
-            Help make
+            {t('grievanceForm.headingLine1')}
             <br />
-            your city <span>better.</span>
+            {t('grievanceForm.headingLine2Prefix')}<span>{t('grievanceForm.headingHighlight')}</span>
           </h1>
 
           <p className="grievance-intro-text">
-            Report a civic issue with enough detail for the
-            concerned team to understand and act quickly.
+            {t('grievanceForm.introText')}
           </p>
 
           <div className="grievance-features">
@@ -117,9 +145,9 @@ export default function NewGrievance() {
               </div>
 
               <div>
-                <strong>Photo evidence</strong>
+                <strong>{t('grievanceForm.features.photo.title')}</strong>
                 <span>
-                  Show the issue exactly as you found it.
+                  {t('grievanceForm.features.photo.text')}
                 </span>
               </div>
             </div>
@@ -130,9 +158,9 @@ export default function NewGrievance() {
               </div>
 
               <div>
-                <strong>Precise location</strong>
+                <strong>{t('grievanceForm.features.location.title')}</strong>
                 <span>
-                  Your location helps identify the exact spot.
+                  {t('grievanceForm.features.location.text')}
                 </span>
               </div>
             </div>
@@ -143,9 +171,9 @@ export default function NewGrievance() {
               </div>
 
               <div>
-                <strong>Smart routing</strong>
+                <strong>{t('grievanceForm.features.routing.title')}</strong>
                 <span>
-                  Your report is routed to the relevant authority.
+                  {t('grievanceForm.features.routing.text')}
                 </span>
               </div>
             </div>
@@ -179,22 +207,22 @@ export default function NewGrievance() {
 
             <div>
               <span className="form-step">
-                REPORT DETAILS
+                {t('grievanceForm.formStep')}
               </span>
 
               <h2>
-                Tell us what happened
+                {t('grievanceForm.formHeading')}
               </h2>
 
               <p>
-                Add the issue details below.
+                {t('grievanceForm.formSubtitle')}
               </p>
             </div>
 
             <div className="report-number">
-              <span>{formatDayLabel(now)}</span>
-              <strong>{formatReportDate(now)}</strong>
-              <small>{formatReportTime(now)}</small>
+              <span>{formatDayLabel(now, lang)}</span>
+              <strong>{formatReportDate(now, lang)}</strong>
+              <small>{formatReportTime(now, lang)}</small>
             </div>
 
           </div>
@@ -208,12 +236,12 @@ export default function NewGrievance() {
               <div className="field">
 
                 <label>
-                  Issue title
+                  {t('grievanceForm.fields.titleLabel')}
                   <span className="required">*</span>
                 </label>
 
                 <input
-                  placeholder="e.g. Pothole on Main Road"
+                  placeholder={t('grievanceForm.fields.titlePlaceholder')}
                   value={f.title}
                   onChange={(e) =>
                     setF({
@@ -231,7 +259,7 @@ export default function NewGrievance() {
               <div className="field">
 
                 <label>
-                  Category
+                  {t('grievanceForm.fields.categoryLabel')}
                   <span className="required">*</span>
                 </label>
 
@@ -244,21 +272,11 @@ export default function NewGrievance() {
                     })
                   }
                 >
-                  <option>Road</option>
-                  <option>Water</option>
-                  <option>Drainage / Waterlogging</option>
-                  <option>Sewage</option>
-                  <option>Garbage</option>
-                  <option>Sanitation / Public Toilet</option>
-                  <option>Street Light</option>
-                  <option>Traffic & Parking</option>
-                  <option>Stray Animals</option>
-                  <option>Illegal Construction / Encroachment</option>
-                  <option>Fallen Tree / Storm Damage</option>
-                  <option>Public Property Damage</option>
-                  <option>Mosquito Breeding / Pest Control</option>
-                  <option>Noise Pollution</option>
-                  <option>Other</option>
+                  {CATEGORY_VALUES.map((value) => (
+                    <option key={value} value={value}>
+                      {t(`categories.${value}`, { ns: 'common', defaultValue: value })}
+                    </option>
+                  ))}
                 </select>
 
               </div>
@@ -269,17 +287,17 @@ export default function NewGrievance() {
 
                 <div className="label-row">
                   <label>
-                    Description
+                    {t('grievanceForm.fields.descriptionLabel')}
                     <span className="required">*</span>
                   </label>
 
                   <span className="field-hint">
-                    Be specific
+                    {t('grievanceForm.fields.descriptionHint')}
                   </span>
                 </div>
 
                 <textarea
-                  placeholder="Describe what happened, where it is, and anything else the city team should know..."
+                  placeholder={t('grievanceForm.fields.descriptionPlaceholder')}
                   value={f.description}
                   onChange={(e) =>
                     setF({
@@ -320,12 +338,11 @@ export default function NewGrievance() {
 
                 <div>
                   <strong>
-                    Location captured
+                    {t('grievanceForm.locationConfirmed.title')}
                   </strong>
 
                   <span>
-                    Your report will include the exact location
-                    and municipal routing information.
+                    {t('grievanceForm.locationConfirmed.text')}
                   </span>
                 </div>
 
@@ -341,7 +358,7 @@ export default function NewGrievance() {
                 type="button"
                 onClick={() => nav('/dashboard')}
               >
-                Cancel
+                {t('grievanceForm.cancel')}
               </button>
 
               <button
@@ -350,10 +367,10 @@ export default function NewGrievance() {
                 disabled={loading}
               >
                 {loading ? (
-                  'Submitting…'
+                  t('grievanceForm.submitting')
                 ) : (
                   <>
-                    Submit report
+                    {t('grievanceForm.submit')}
                     <span>→</span>
                   </>
                 )}

@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { getMyGrievances } from '../../api/grievance.api';
 import { useAuth } from '../../context/AuthContext';
 import PhotoThumb from '../../components/PhotoThumb';
 import MapLink from '../../components/MapLink';
 import MunicipalBadge from '../../components/MunicipalBadge';
-
-const label = (s) => s.replace('_', ' ');
 
 function AnimatedGreeting({ name }) {
   const [text, setText] = useState('');
@@ -57,6 +56,7 @@ function AnimatedGreeting({ name }) {
   );
 }
 export default function Dashboard() {
+  const { t } = useTranslation(['citizen', 'common']);
   const [items, setItems] = useState([]);
   const [msg, setMsg] = useState('');
   const { user } = useAuth();
@@ -68,11 +68,12 @@ export default function Dashboard() {
         setItems(r.data.data);
         setMsg('');
       } catch (e) {
-        setMsg('Could not load your grievances.');
+        setMsg(t('dashboard.loadError'));
       }
     };
 
     load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const load = async () => {
@@ -81,7 +82,7 @@ export default function Dashboard() {
       setItems(r.data.data);
       setMsg('');
     } catch (e) {
-      setMsg('Could not load your grievances.');
+      setMsg(t('dashboard.loadError'));
     }
   };
 
@@ -105,13 +106,13 @@ export default function Dashboard() {
             className="eyebrow"
             style={{ color: 'var(--primary)' }}
           >
-            Citizen dashboard
+            {t('dashboard.eyebrow')}
           </span>
 
           <AnimatedGreeting name={user?.name} />
 
           <p>
-            Here’s the latest on the issues you’ve reported.
+            {t('dashboard.subtitle')}
           </p>
         </div>
 
@@ -120,14 +121,14 @@ export default function Dashboard() {
             className="ghost-btn"
             onClick={load}
           >
-            ↻ Refresh
+            ↻ {t('dashboard.refresh')}
           </button>
 
           <Link
             className="button"
             to="/grievance/new"
           >
-            ＋ Report an issue
+            ＋ {t('dashboard.reportIssue')}
           </Link>
         </div>
       </div>
@@ -135,7 +136,7 @@ export default function Dashboard() {
       <div className="stat-grid">
         <div className="panel stat">
           <div className="stat-top">
-            <span>Pending</span>
+            <span>{t('dashboard.stats.pending')}</span>
             <span className="stat-icon">◷</span>
           </div>
 
@@ -146,7 +147,7 @@ export default function Dashboard() {
 
         <div className="panel stat">
           <div className="stat-top">
-            <span>In progress</span>
+            <span>{t('dashboard.stats.inProgress')}</span>
             <span className="stat-icon">↗</span>
           </div>
 
@@ -157,7 +158,7 @@ export default function Dashboard() {
 
         <div className="panel stat">
           <div className="stat-top">
-            <span>Resolved</span>
+            <span>{t('dashboard.stats.resolved')}</span>
             <span className="stat-icon">✓</span>
           </div>
 
@@ -170,15 +171,14 @@ export default function Dashboard() {
       <div className="panel table-panel">
         <div className="panel-head">
           <div>
-            <h3>Your grievances</h3>
+            <h3>{t('dashboard.tableHeading')}</h3>
 
             <span>
-              {items.length} report
-              {items.length !== 1 ? 's' : ''} submitted
+              {t('dashboard.reportCount', { count: items.length })}
             </span>
           </div>
 
-          <span>Live status</span>
+          <span>{t('dashboard.liveStatus')}</span>
         </div>
 
         {msg && (
@@ -194,17 +194,17 @@ export default function Dashboard() {
           <div className="empty">
             <div className="empty-icon">⌁</div>
 
-            <strong>No grievances yet</strong>
+            <strong>{t('dashboard.empty.title')}</strong>
 
             <p>
-              When you report a civic issue, it will appear here.
+              {t('dashboard.empty.text')}
             </p>
 
             <Link
               className="button"
               to="/grievance/new"
             >
-              Report your first issue
+              {t('dashboard.empty.cta')}
             </Link>
           </div>
         ) : (
@@ -212,35 +212,35 @@ export default function Dashboard() {
             <table>
               <thead>
                 <tr>
-                  <th>Photo</th>
-                  <th>Issue</th>
-                  <th>Category</th>
-                  <th>Location</th>
-                  <th>Routed to</th>
-                  <th>Status</th>
+                  <th>{t('dashboard.table.photo')}</th>
+                  <th>{t('dashboard.table.issue')}</th>
+                  <th>{t('dashboard.table.category')}</th>
+                  <th>{t('dashboard.table.location')}</th>
+                  <th>{t('dashboard.table.routedTo')}</th>
+                  <th>{t('dashboard.table.status')}</th>
                 </tr>
               </thead>
 
               <tbody>
                 {items.map((g) => (
                   <tr key={g.id}>
-                    <td data-label="Photo">
+                    <td data-label={t('dashboard.table.photo')}>
                       <PhotoThumb src={g.photo} />
                     </td>
 
                     <td
-                      data-label="Issue"
+                      data-label={t('dashboard.table.issue')}
                       className="title-cell"
                     >
                       {g.title}
                     </td>
 
-                    <td data-label="Category">
-                      {g.category}
+                    <td data-label={t('dashboard.table.category')}>
+                      {t(`categories.${g.category}`, { ns: 'common', defaultValue: g.category })}
                     </td>
 
                     <td
-                      data-label="Location"
+                      data-label={t('dashboard.table.location')}
                       className="location-cell"
                     >
                       <MapLink
@@ -251,7 +251,7 @@ export default function Dashboard() {
                     </td>
 
                     <td
-                      data-label="Routed to"
+                      data-label={t('dashboard.table.routedTo')}
                       className="location-cell"
                     >
                       <MunicipalBadge
@@ -260,11 +260,11 @@ export default function Dashboard() {
                       />
                     </td>
 
-                    <td data-label="Status">
+                    <td data-label={t('dashboard.table.status')}>
                       <span
                         className={`status ${g.status}`}
                       >
-                        {label(g.status)}
+                        {t(`statuses.${g.status}`, { ns: 'common', defaultValue: g.status.replace('_', ' ') })}
                       </span>
                     </td>
                   </tr>

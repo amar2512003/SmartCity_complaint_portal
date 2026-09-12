@@ -1,1 +1,24 @@
-import {Link,useParams} from 'react-router-dom'; export default function GrievanceDetail(){const {id}=useParams();return <div className="form-panel panel"><span className="eyebrow" style={{color:'var(--primary)'}}>Report #{id}</span><h2>Grievance details</h2><div className="empty" style={{padding:'30px 0'}}><div className="empty-icon">🗂️</div><strong>Detailed view coming soon</strong><p>You can already track this report's status, photo, location, and routing from the main dashboard.</p><Link className="button" to="/dashboard">← Back to dashboard</Link></div></div>}
+import { Link, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+
+export default function GrievanceDetail() {
+  const { t } = useTranslation('citizen');
+  const { id } = useParams();
+
+  return (
+    <div className="form-panel panel">
+      <span className="eyebrow" style={{ color: 'var(--primary)' }}>
+        {t('grievanceDetail.reportNumber', { id })}
+      </span>
+      <h2>{t('grievanceDetail.heading')}</h2>
+      <div className="empty" style={{ padding: '30px 0' }}>
+        <div className="empty-icon">🗂️</div>
+        <strong>{t('grievanceDetail.comingSoon')}</strong>
+        <p>{t('grievanceDetail.comingSoonText')}</p>
+        <Link className="button" to="/dashboard">
+          {t('grievanceDetail.backToDashboard')}
+        </Link>
+      </div>
+    </div>
+  );
+}

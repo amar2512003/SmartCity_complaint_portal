@@ -48,9 +48,67 @@ function getTransporter() {
   return transporter;
 }
 
-export async function sendOtpEmail({ to, otp, name }) {
+// OTP email copy, in the citizen's language. Selected in
+// auth.citizen.controller.js: the citizen's saved preferred_language for
+// login OTPs, or the language of the signup request itself (req.lang) when
+// signing up, since there's no user record yet to read a preference from.
+const OTP_EMAIL_COPY = {
+  en: {
+    subject: (otp) => `${otp} — Your SmartCity verification code`,
+    headlineLine1: "Let's make",
+    headlineLine2: "Kolkata better.",
+    tagline: "Your city. Your voice.",
+    eyebrow: "Email verification",
+    title: "Verify your email",
+    intro: (firstName) =>
+      `Hi ${firstName}, you're almost there. Use the verification code below to continue with your SmartCity account.`,
+    codeLabel: "Your verification code",
+    expiresStrong: "This code expires in 10 minutes.",
+    expiresNote: "For your security, never share your verification code with anyone.",
+    cantFind: "Can't find this email?",
+    cantFindNote:
+      'Please check your Spam or Promotions folder — and consider marking this address as "Not spam" so future codes arrive in your inbox.',
+    didntRequest: "Didn't request this code? No worries — you can safely ignore this email.",
+    footerTagline: "Your city. Your voice.",
+    footerMaking: "Making civic services simpler, one report at a time.",
+    automated: "This is an automated message. Please do not reply to this email.",
+    textGreeting: (firstName) => `Hi ${firstName},`,
+    textIntro: "Use the verification code below to continue with your SmartCity account:",
+    textExpiry: "This code is valid for 10 minutes.",
+    textSecurity: "For your security, please do not share this code with anyone.",
+    textIgnore: "If you didn't request this verification code, you can safely ignore this email.",
+  },
+  bn: {
+    subject: (otp) => `${otp} — আপনার SmartCity যাচাইকরণ কোড`,
+    headlineLine1: "আসুন",
+    headlineLine2: "কলকাতাকে আরও ভালো করি।",
+    tagline: "আপনার শহর। আপনার কণ্ঠস্বর।",
+    eyebrow: "ইমেল যাচাইকরণ",
+    title: "আপনার ইমেল যাচাই করুন",
+    intro: (firstName) =>
+      `হ্যালো ${firstName}, আপনি প্রায় শেষ পর্যায়ে। আপনার SmartCity অ্যাকাউন্ট চালিয়ে যেতে নিচের যাচাইকরণ কোডটি ব্যবহার করুন।`,
+    codeLabel: "আপনার যাচাইকরণ কোড",
+    expiresStrong: "এই কোডের মেয়াদ ১০ মিনিটে শেষ হবে।",
+    expiresNote: "নিরাপত্তার জন্য, আপনার যাচাইকরণ কোড কারো সাথে শেয়ার করবেন না।",
+    cantFind: "এই ইমেলটি খুঁজে পাচ্ছেন না?",
+    cantFindNote:
+      'অনুগ্রহ করে আপনার স্প্যাম বা প্রোমোশনস ফোল্ডার দেখুন — এবং ভবিষ্যতে কোড ইনবক্সে পেতে এই ঠিকানাটিকে "স্প্যাম নয়" হিসেবে চিহ্নিত করার কথা বিবেচনা করুন।',
+    didntRequest: "এই কোডটি অনুরোধ করেননি? চিন্তা নেই — আপনি নিশ্চিন্তে এই ইমেলটি উপেক্ষা করতে পারেন।",
+    footerTagline: "আপনার শহর। আপনার কণ্ঠস্বর।",
+    footerMaking: "নাগরিক পরিষেবা সহজ করা, একটি রিপোর্ট এ একবার।",
+    automated: "এটি একটি স্বয়ংক্রিয় বার্তা। অনুগ্রহ করে এই ইমেলের উত্তর দেবেন না।",
+    textGreeting: (firstName) => `হ্যালো ${firstName},`,
+    textIntro: "আপনার SmartCity অ্যাকাউন্ট চালিয়ে যেতে নিচের যাচাইকরণ কোডটি ব্যবহার করুন:",
+    textExpiry: "এই কোডটি ১০ মিনিটের জন্য বৈধ।",
+    textSecurity: "নিরাপত্তার জন্য, অনুগ্রহ করে এই কোডটি কারো সাথে শেয়ার করবেন না।",
+    textIgnore: "যদি আপনি এই যাচাইকরণ কোডটি অনুরোধ না করে থাকেন, তাহলে আপনি নিশ্চিন্তে এই ইমেলটি উপেক্ষা করতে পারেন।",
+  },
+};
+
+export async function sendOtpEmail({ to, otp, name, lang }) {
   // Falls back to a neutral greeting if no name was captured at signup.
   const firstName = (name || "").trim().split(/\s+/)[0] || "there";
+  const copy = OTP_EMAIL_COPY[lang] || OTP_EMAIL_COPY.en;
 
   const fromAddress = required("SMTP_USER");
   // SMTP_FROM should be a mailbox on a domain you control with SPF/DKIM/DMARC
@@ -68,7 +126,7 @@ export async function sendOtpEmail({ to, otp, name }) {
     // "looks fine" still gets spam-scored.
     envelope: { from: senderAddress, to },
     messageId,
-    subject: `${otp} — Your SmartCity verification code`,
+    subject: copy.subject(otp),
 
     // Gmail/Yahoo's bulk-sender rules increasingly weight the presence of a
     // List-Unsubscribe header even for transactional mail. mailto: is enough
@@ -81,22 +139,22 @@ export async function sendOtpEmail({ to, otp, name }) {
 
     text: `
 SmartCity Portal
-Your city. Your voice.
+${copy.tagline}
 
-Hi ${firstName},
+${copy.textGreeting(firstName)}
 
-Use the verification code below to continue with your SmartCity account:
+${copy.textIntro}
 
 ${otp}
 
-This code is valid for 10 minutes.
+${copy.textExpiry}
 
-For your security, please do not share this code with anyone.
+${copy.textSecurity}
 
-If you didn't request this verification code, you can safely ignore this email.
+${copy.textIgnore}
 
 SmartCity Portal
-Making civic services simpler, one report at a time.
+${copy.footerMaking}
     `,
 
     html: `
@@ -108,12 +166,20 @@ Making civic services simpler, one report at a time.
   <title>SmartCity Verification</title>
 </head>
 
+<!-- No @import/web font here on purpose — Gmail, Outlook desktop, and
+     several other clients strip <style>-based @import or ignore it
+     entirely, so a webfont can't be relied on for the OTP code itself.
+     Instead the stack lists common Bengali-capable system fonts (Noto Sans
+     Bengali on Android/Chrome OS, Nirmala UI on Windows, Vrinda as an older
+     Windows fallback) ahead of the final generic sans-serif, so each
+     client's own font-substitution picks a glyph-complete font for the
+     Bengali variant instead of leaving conjuncts to chance. -->
 <body
   style="
     margin:0;
     padding:0;
     background:#f4f4f4;
-    font-family:Arial, Helvetica, sans-serif;
+    font-family: Arial, Helvetica, 'Noto Sans Bengali', 'Nirmala UI', 'Vrinda', 'Mukta', sans-serif;
   "
 >
 
@@ -204,7 +270,7 @@ Making civic services simpler, one report at a time.
                   text-transform:uppercase;
                 "
               >
-                Your city. Your voice.
+                ${copy.tagline}
               </div>
 
               <div
@@ -216,8 +282,8 @@ Making civic services simpler, one report at a time.
                   margin-top:10px;
                 "
               >
-                Let's make<br />
-                Kolkata better.
+                ${copy.headlineLine1}<br />
+                ${copy.headlineLine2}
               </div>
 
             </td>
@@ -243,7 +309,7 @@ Making civic services simpler, one report at a time.
                   margin-bottom:10px;
                 "
               >
-                Email verification
+                ${copy.eyebrow}
               </div>
 
               <h1
@@ -255,7 +321,7 @@ Making civic services simpler, one report at a time.
                   letter-spacing:-0.8px;
                 "
               >
-                Verify your email
+                ${copy.title}
               </h1>
 
               <p
@@ -266,9 +332,7 @@ Making civic services simpler, one report at a time.
                   line-height:1.7;
                 "
               >
-                Hi ${firstName}, you're almost there.
-                Use the verification code below to continue
-                with your SmartCity account.
+                ${copy.intro(firstName)}
               </p>
 
 
@@ -301,7 +365,7 @@ Making civic services simpler, one report at a time.
                         margin-bottom:12px;
                       "
                     >
-                      Your verification code
+                      ${copy.codeLabel}
                     </div>
 
                     <div
@@ -356,11 +420,10 @@ Making civic services simpler, one report at a time.
                     "
                   >
                     <strong style="color:#333333;">
-                      This code expires in 10 minutes.
+                      ${copy.expiresStrong}
                     </strong>
                     <br />
-                    For your security, never share your verification
-                    code with anyone.
+                    ${copy.expiresNote}
                   </td>
 
                 </tr>
@@ -374,7 +437,7 @@ Making civic services simpler, one report at a time.
                   font-weight:700;
                 "
               >
-                Can't find this email?
+                ${copy.cantFind}
               </p>
 
               <p
@@ -385,9 +448,7 @@ Making civic services simpler, one report at a time.
                   line-height:1.6;
                 "
               >
-                Please check your Spam or Promotions folder — and consider
-                marking this address as "Not spam" so future codes arrive
-                in your inbox.
+                ${copy.cantFindNote}
               </p>
 
               <p
@@ -398,8 +459,7 @@ Making civic services simpler, one report at a time.
                   line-height:1.6;
                 "
               >
-                Didn't request this code?
-                No worries — you can safely ignore this email.
+                ${copy.didntRequest}
               </p>
 
             </td>
@@ -433,10 +493,9 @@ Making civic services simpler, one report at a time.
                   line-height:1.6;
                 "
               >
-                Your city. Your voice.
+                ${copy.footerTagline}
                 <br />
-                Making civic services simpler,
-                one report at a time.
+                ${copy.footerMaking}
               </div>
 
               <div
@@ -448,7 +507,7 @@ Making civic services simpler, one report at a time.
                   font-size:11px;
                 "
               >
-                This is an automated message. Please do not reply to this email.
+                ${copy.automated}
               </div>
 
             </td>

@@ -1,13 +1,11 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { getAllGrievances, updateStatus } from '../../api/grievance.api';
 import PhotoThumb from '../../components/PhotoThumb';
 import MapLink from '../../components/MapLink';
 import MunicipalBadge from '../../components/MunicipalBadge';
 
-const label = (s) => s.replace('_', ' ');
-
 const WEST_BENGAL_DISTRICTS = [
-  'All Districts',
   'Alipurduar',
   'Bankura',
   'Paschim Bardhaman',
@@ -33,8 +31,10 @@ const WEST_BENGAL_DISTRICTS = [
 ];
 
 export default function AdminDashboard() {
+  const { t } = useTranslation(['admin', 'common']);
+  const ALL_DISTRICTS = t('dashboard.allDistricts');
   const [items, setItems] = useState([]);
-  const [selectedDistrict, setSelectedDistrict] = useState('All Districts');
+  const [selectedDistrict, setSelectedDistrict] = useState(ALL_DISTRICTS);
   const [msg, setMsg] = useState('');
 
   const load = async () => {
@@ -43,12 +43,13 @@ export default function AdminDashboard() {
       setItems(r.data.data);
       setMsg('');
     } catch (e) {
-      setMsg('Could not load grievances.');
+      setMsg(t('dashboard.loadError'));
     }
   };
 
   useEffect(() => {
     load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const change = async (id, status) => {
@@ -56,13 +57,13 @@ export default function AdminDashboard() {
       await updateStatus(id, status);
       load();
     } catch (e) {
-      setMsg('Could not update status.');
+      setMsg(t('dashboard.updateError'));
     }
   };
 
   // Filter grievances according to selected district
   const filteredItems =
-    selectedDistrict === 'All Districts'
+    selectedDistrict === ALL_DISTRICTS
       ? items
       : items.filter(
           (g) =>
@@ -87,21 +88,21 @@ export default function AdminDashboard() {
     <>
       <div className="admin-banner">
         <div>
-          <h1>Grievance desk</h1>
+          <h1>{t('dashboard.heading')}</h1>
           <p>
-            Review and move citizen reports through the resolution workflow.
+            {t('dashboard.subtitle')}
           </p>
         </div>
 
         <div className="admin-pill">
-          ● Operations online
+          ● {t('dashboard.operationsOnline')}
         </div>
       </div>
 
       <div className="stat-grid">
         <div className="panel stat">
           <div className="stat-top">
-            <span>Awaiting review</span>
+            <span>{t('dashboard.stats.pending')}</span>
             <span className="stat-icon">◷</span>
           </div>
 
@@ -112,7 +113,7 @@ export default function AdminDashboard() {
 
         <div className="panel stat">
           <div className="stat-top">
-            <span>Being handled</span>
+            <span>{t('dashboard.stats.inProgress')}</span>
             <span className="stat-icon">↗</span>
           </div>
 
@@ -123,7 +124,7 @@ export default function AdminDashboard() {
 
         <div className="panel stat">
           <div className="stat-top">
-            <span>Resolved</span>
+            <span>{t('dashboard.stats.resolved')}</span>
             <span className="stat-icon">✓</span>
           </div>
 
@@ -136,11 +137,10 @@ export default function AdminDashboard() {
       <div className="panel table-panel">
         <div className="panel-head">
           <div>
-            <h3>Citizen reports</h3>
+            <h3>{t('dashboard.tableHeading')}</h3>
 
             <span>
-              {filteredItems.length} total grievance
-              {filteredItems.length !== 1 ? 's' : ''}
+              {t('dashboard.reportCount', { count: filteredItems.length })}
             </span>
           </div>
 
@@ -156,6 +156,7 @@ export default function AdminDashboard() {
                 cursor: 'pointer',
               }}
             >
+              <option value={ALL_DISTRICTS}>{ALL_DISTRICTS}</option>
               {WEST_BENGAL_DISTRICTS.map((district) => (
                 <option key={district} value={district}>
                   {district}
@@ -167,7 +168,7 @@ export default function AdminDashboard() {
               className="ghost-btn"
               onClick={load}
             >
-              ↻ Refresh
+              ↻ {t('dashboard.refresh')}
             </button>
           </div>
         </div>
@@ -185,12 +186,12 @@ export default function AdminDashboard() {
           <div className="empty">
             <div className="empty-icon">⌁</div>
 
-            <strong>No reports found</strong>
+            <strong>{t('dashboard.empty.title')}</strong>
 
             <p>
-              {selectedDistrict === 'All Districts'
-                ? 'New citizen grievances will appear here.'
-                : `No grievances found for ${selectedDistrict} district.`}
+              {selectedDistrict === ALL_DISTRICTS
+                ? t('dashboard.empty.textAll')
+                : t('dashboard.empty.textFiltered', { district: selectedDistrict })}
             </p>
           </div>
         ) : (
@@ -198,15 +199,15 @@ export default function AdminDashboard() {
             <table>
               <thead>
                 <tr>
-                  <th>Photo</th>
-                  <th>ID</th>
-                  <th>Citizen</th>
-                  <th>Issue</th>
-                  <th>Category</th>
-                  <th>Location</th>
-                  <th>Notify</th>
-                  <th>Status</th>
-                  <th>Update</th>
+                  <th>{t('dashboard.table.photo')}</th>
+                  <th>{t('dashboard.table.id')}</th>
+                  <th>{t('dashboard.table.citizen')}</th>
+                  <th>{t('dashboard.table.issue')}</th>
+                  <th>{t('dashboard.table.category')}</th>
+                  <th>{t('dashboard.table.location')}</th>
+                  <th>{t('dashboard.table.notify')}</th>
+                  <th>{t('dashboard.table.status')}</th>
+                  <th>{t('dashboard.table.update')}</th>
                 </tr>
               </thead>
 
@@ -230,7 +231,7 @@ export default function AdminDashboard() {
                     </td>
 
                     <td>
-                      {g.category}
+                      {t(`categories.${g.category}`, { ns: 'common', defaultValue: g.category })}
                     </td>
 
                     <td>
@@ -252,7 +253,7 @@ export default function AdminDashboard() {
                       <span
                         className={`status ${g.status}`}
                       >
-                        {label(g.status)}
+                        {t(`statuses.${g.status}`, { ns: 'common', defaultValue: g.status.replace('_', ' ') })}
                       </span>
                     </td>
 
@@ -265,19 +266,19 @@ export default function AdminDashboard() {
                         }
                       >
                         <option value="pending">
-                          Pending
+                          {t('statuses.pending', { ns: 'common' })}
                         </option>
 
                         <option value="in_progress">
-                          In progress
+                          {t('statuses.in_progress', { ns: 'common' })}
                         </option>
 
                         <option value="resolved">
-                          Resolved
+                          {t('statuses.resolved', { ns: 'common' })}
                         </option>
 
                         <option value="rejected">
-                          Rejected
+                          {t('statuses.rejected', { ns: 'common' })}
                         </option>
                       </select>
                     </td>
