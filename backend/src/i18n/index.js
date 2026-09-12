@@ -55,7 +55,7 @@ const resources = {
     assistant: {
       not_configured: 'AI assistant is not configured. Ask the administrator to set GROQ_API_KEY.',
       messages_required: 'messages array is required',
-      off_topic_reply: 'I\'m here to help with the SmartCity portal and civic grievance services. I can help you submit a grievance, track a complaint, understand categories, location capture, routing, or other SmartCity features.',
+      off_topic_reply: 'I\'m here to help with the Samadhan portal and civic grievance services. I can help you submit a grievance, track a complaint, understand categories, location capture, routing, or other Samadhan features.',
       unavailable: 'The AI assistant is unavailable right now. Please try again shortly.',
       empty_response: 'The AI assistant returned an empty response.',
       unreachable: 'Could not reach the AI assistant.',

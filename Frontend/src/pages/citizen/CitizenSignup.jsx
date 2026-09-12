@@ -90,7 +90,7 @@ export default function CitizenSignup() {
       )}
 
       <section className="auth-visual">
-        <Link className="brand" to="/citizen/login"><span className="brand-mark"><img src={brandMark} alt="" style={{ width: 22, height: 22, objectFit: 'contain' }} /></span><span>SmartCity</span></Link>
+        <Link className="brand" to="/citizen/login"><span className="brand-mark"><img src={brandMark} alt="" style={{ width: 22, height: 22, objectFit: 'contain' }} /></span><span></span></Link>
         <div className="auth-copy">
           <span className="eyebrow">{t('signup.eyebrow')}</span>
           <h1>{t('signup.heading')}</h1>
@@ -103,7 +103,7 @@ export default function CitizenSignup() {
       <section className="auth-form-side">
         <LanguageToggle />
         <div className="auth-card">
-          <Link className="brand" to="/citizen/login"><span className="brand-mark"><img src={brandMark} alt="" style={{ width: 22, height: 22, objectFit: 'contain' }} /></span><span>SmartCity Portal</span></Link>
+          <Link className="brand" to="/citizen/login"><span className="brand-mark"><img src={brandMark} alt="" style={{ width: 22, height: 22, objectFit: 'contain' }} /></span><span>Samadhan.</span></Link>
           {step === 'details' ? (
             <>
               <div className="step-label"><span className="step-dot active">1</span><span>{t('signup.stepAccountDetails')}</span><i /><span className="step-dot">2</span><span>{t('signup.stepVerifyEmail')}</span></div>

@@ -38,7 +38,7 @@ export default function CitizenLogin() {
   return (
     <div className="auth-page">
       <section className="auth-visual">
-        <Link className="brand" to="/citizen/login"><span className="brand-mark"><img src={brandMark} alt="" style={{ width: 22, height: 22, objectFit: 'contain' }} /></span><span>SmartCity</span></Link>
+        <Link className="brand" to="/citizen/login"><span className="brand-mark"><img src={brandMark} alt="" style={{ width: 22, height: 22, objectFit: 'contain' }} /></span><span>Samadhan.</span></Link>
         <div className="auth-copy">
           <span className="eyebrow">{t('brand.tagline')}</span>
           <h1>{t('login.heading')}</h1>
@@ -50,7 +50,7 @@ export default function CitizenLogin() {
       <section className="auth-form-side">
         <LanguageToggle />
         <div className="auth-card">
-          <Link className="brand" to="/citizen/login"><span className="brand-mark"><img src={brandMark} alt="" style={{ width: 22, height: 22, objectFit: 'contain' }} /></span><span>SmartCity Portal</span></Link>
+          <Link className="brand" to="/citizen/login"><span className="brand-mark"><img src={brandMark} alt="" style={{ width: 22, height: 22, objectFit: 'contain' }} /></span><span>Samadhan.</span></Link>
           {step === 'email' ? (
             <>
               <h2>{t('login.welcomeBack')}</h2>

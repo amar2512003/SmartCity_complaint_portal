@@ -7,7 +7,7 @@ export default function Footer() {
     <footer style={{ textAlign: 'center', padding: '18px 20px', marginTop: 'auto', borderTop: '1px solid var(--line)', fontSize: 13, color: 'var(--muted)' }}>
       {t('shared.builtBy')}{' '}
       <a
-        href="https://github.com/amar2512003"
+        href="https://v0-amarsinhaaa.vercel.app/"
         target="_blank"
         rel="noreferrer"
         style={{ color: 'var(--primary-dark)', fontWeight: 700, textDecoration: 'none' }}

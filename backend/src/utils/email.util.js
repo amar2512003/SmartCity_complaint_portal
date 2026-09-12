@@ -55,6 +55,7 @@ function getTransporter() {
 const OTP_EMAIL_COPY = {
   en: {
     subject: (otp) => `${otp} — Your SmartCity verification code`,
+    subjectLabel: "Your SmartCity verification code",
     headlineLine1: "Let's make",
     headlineLine2: "Kolkata better.",
     tagline: "Your city. Your voice.",
@@ -80,6 +81,7 @@ const OTP_EMAIL_COPY = {
   },
   bn: {
     subject: (otp) => `${otp} — আপনার SmartCity যাচাইকরণ কোড`,
+    subjectLabel: "আপনার SmartCity যাচাইকরণ কোড",
     headlineLine1: "আসুন",
     headlineLine2: "কলকাতাকে আরও ভালো করি।",
     tagline: "আপনার শহর। আপনার কণ্ঠস্বর।",
@@ -105,10 +107,172 @@ const OTP_EMAIL_COPY = {
   },
 };
 
+// Renders one language's content block: eyebrow, title, intro, the OTP box,
+// and the expiry/can't-find/didn't-request notes. Used twice per email (once
+// per language) so each block reads as complete on its own — someone
+// scanning just the Bengali half (or just the English half) gets full
+// instructions without needing the other language's text for context.
+function renderHtmlBlock(copy, otp, firstName) {
+  return `
+              <div
+                style="
+                  color:#ff6a1a;
+                  font-size:12px;
+                  font-weight:800;
+                  letter-spacing:1.5px;
+                  text-transform:uppercase;
+                  margin-bottom:10px;
+                "
+              >
+                ${copy.eyebrow}
+              </div>
+
+              <h1
+                style="
+                  margin:0 0 12px;
+                  color:#1d1d1d;
+                  font-size:26px;
+                  line-height:1.2;
+                  letter-spacing:-0.8px;
+                "
+              >
+                ${copy.title}
+              </h1>
+
+              <p
+                style="
+                  margin:0;
+                  color:#6f6f6f;
+                  font-size:15px;
+                  line-height:1.7;
+                "
+              >
+                ${copy.intro(firstName)}
+              </p>
+
+              <table
+                width="100%"
+                cellpadding="0"
+                cellspacing="0"
+                border="0"
+                style="margin:24px 0;"
+              >
+                <tr>
+                  <td
+                    align="center"
+                    style="
+                      background:#fff4ec;
+                      border:1px solid #ffd8c0;
+                      border-radius:16px;
+                      padding:25px 15px;
+                    "
+                  >
+                    <div
+                      style="
+                        color:#8b8b8b;
+                        font-size:11px;
+                        font-weight:700;
+                        letter-spacing:2px;
+                        text-transform:uppercase;
+                        margin-bottom:12px;
+                      "
+                    >
+                      ${copy.codeLabel}
+                    </div>
+
+                    <div
+                      style="
+                        color:#ff5f0a;
+                        font-size:38px;
+                        line-height:1;
+                        font-weight:800;
+                        letter-spacing:11px;
+                        margin-left:11px;
+                      "
+                    >
+                      ${otp}
+                    </div>
+                  </td>
+                </tr>
+              </table>
+
+              <table
+                width="100%"
+                cellpadding="0"
+                cellspacing="0"
+                border="0"
+                style="
+                  background:#fafafa;
+                  border-radius:12px;
+                  margin-bottom:20px;
+                "
+              >
+                <tr>
+                  <td
+                    width="35"
+                    valign="top"
+                    style="
+                      padding:15px 0 15px 15px;
+                      font-size:17px;
+                    "
+                  >
+                    ⏱
+                  </td>
+                  <td
+                    style="
+                      padding:14px 15px 14px 8px;
+                      color:#555555;
+                      font-size:13px;
+                      line-height:1.5;
+                    "
+                  >
+                    <strong style="color:#333333;">${copy.expiresStrong}</strong>
+                    <br />
+                    ${copy.expiresNote}
+                  </td>
+                </tr>
+              </table>
+
+              <p style="margin:0 0 4px;color:#333333;font-size:13px;font-weight:700;">
+                ${copy.cantFind}
+              </p>
+              <p style="margin:0;color:#888888;font-size:12.5px;line-height:1.6;">
+                ${copy.cantFindNote}
+              </p>
+              <p style="margin:16px 0 0;color:#888888;font-size:13px;line-height:1.6;">
+                ${copy.didntRequest}
+              </p>
+`;
+}
+
+function renderTextBlock(copy, otp, firstName) {
+  return `${copy.textGreeting(firstName)}
+
+${copy.textIntro}
+
+${otp}
+
+${copy.textExpiry}
+
+${copy.textSecurity}
+
+${copy.textIgnore}`;
+}
+
 export async function sendOtpEmail({ to, otp, name, lang }) {
   // Falls back to a neutral greeting if no name was captured at signup.
   const firstName = (name || "").trim().split(/\s+/)[0] || "there";
-  const copy = OTP_EMAIL_COPY[lang] || OTP_EMAIL_COPY.en;
+
+  // Every OTP email carries both languages in full — not just the citizen's
+  // preferred one — since the code is time-limited and we can't assume the
+  // preferred-language setting is who's actually reading the inbox right
+  // now (shared family email, a relative helping out, etc). The citizen's
+  // preferred language still renders first so it's the one they see without
+  // scrolling.
+  const primaryLang = OTP_EMAIL_COPY[lang] ? lang : "en";
+  const secondaryLang = primaryLang === "en" ? "bn" : "en";
+  const primary = OTP_EMAIL_COPY[primaryLang];
+  const secondary = OTP_EMAIL_COPY[secondaryLang];
 
   const fromAddress = required("SMTP_USER");
   // SMTP_FROM should be a mailbox on a domain you control with SPF/DKIM/DMARC
@@ -126,7 +290,9 @@ export async function sendOtpEmail({ to, otp, name, lang }) {
     // "looks fine" still gets spam-scored.
     envelope: { from: senderAddress, to },
     messageId,
-    subject: copy.subject(otp),
+    // Bilingual subject line so it reads correctly in the inbox preview
+    // regardless of which language the citizen scans first.
+    subject: `${otp} — ${primary.subjectLabel} / ${secondary.subjectLabel}`,
 
     // Gmail/Yahoo's bulk-sender rules increasingly weight the presence of a
     // List-Unsubscribe header even for transactional mail. mailto: is enough
@@ -139,22 +305,16 @@ export async function sendOtpEmail({ to, otp, name, lang }) {
 
     text: `
 SmartCity Portal
-${copy.tagline}
+${primary.tagline}
 
-${copy.textGreeting(firstName)}
+${renderTextBlock(primary, otp, firstName)}
 
-${copy.textIntro}
+——————————————
 
-${otp}
-
-${copy.textExpiry}
-
-${copy.textSecurity}
-
-${copy.textIgnore}
+${renderTextBlock(secondary, otp, firstName)}
 
 SmartCity Portal
-${copy.footerMaking}
+${primary.footerMaking}
     `,
 
     html: `
@@ -270,198 +430,53 @@ ${copy.footerMaking}
                   text-transform:uppercase;
                 "
               >
-                ${copy.tagline}
+                ${primary.tagline} · ${secondary.tagline}
               </div>
 
               <div
                 style="
                   color:#ffffff;
-                  font-size:28px;
+                  font-size:26px;
                   line-height:1.15;
                   font-weight:800;
                   margin-top:10px;
                 "
               >
-                ${copy.headlineLine1}<br />
-                ${copy.headlineLine2}
+                ${primary.headlineLine1} ${primary.headlineLine2}
               </div>
 
             </td>
           </tr>
 
 
-          <!-- Content -->
+          <!-- Content: primary language block -->
           <tr>
             <td
               style="
-                padding:38px 38px 35px;
+                padding:38px 38px 8px;
                 background:#ffffff;
               "
             >
+${renderHtmlBlock(primary, otp, firstName)}
+            </td>
+          </tr>
 
-              <div
-                style="
-                  color:#ff6a1a;
-                  font-size:12px;
-                  font-weight:800;
-                  letter-spacing:1.5px;
-                  text-transform:uppercase;
-                  margin-bottom:10px;
-                "
-              >
-                ${copy.eyebrow}
-              </div>
+          <!-- Language divider -->
+          <tr>
+            <td style="padding:0 38px;">
+              <div style="height:1px;background:#eeeeee;margin:14px 0;"></div>
+            </td>
+          </tr>
 
-              <h1
-                style="
-                  margin:0 0 12px;
-                  color:#1d1d1d;
-                  font-size:30px;
-                  line-height:1.2;
-                  letter-spacing:-0.8px;
-                "
-              >
-                ${copy.title}
-              </h1>
-
-              <p
-                style="
-                  margin:0;
-                  color:#6f6f6f;
-                  font-size:15px;
-                  line-height:1.7;
-                "
-              >
-                ${copy.intro(firstName)}
-              </p>
-
-
-              <!-- OTP Box -->
-              <table
-                width="100%"
-                cellpadding="0"
-                cellspacing="0"
-                border="0"
-                style="margin:28px 0;"
-              >
-                <tr>
-                  <td
-                    align="center"
-                    style="
-                      background:#fff4ec;
-                      border:1px solid #ffd8c0;
-                      border-radius:16px;
-                      padding:25px 15px;
-                    "
-                  >
-
-                    <div
-                      style="
-                        color:#8b8b8b;
-                        font-size:11px;
-                        font-weight:700;
-                        letter-spacing:2px;
-                        text-transform:uppercase;
-                        margin-bottom:12px;
-                      "
-                    >
-                      ${copy.codeLabel}
-                    </div>
-
-                    <div
-                      style="
-                        color:#ff5f0a;
-                        font-size:38px;
-                        line-height:1;
-                        font-weight:800;
-                        letter-spacing:11px;
-                        margin-left:11px;
-                      "
-                    >
-                      ${otp}
-                    </div>
-
-                  </td>
-                </tr>
-              </table>
-
-
-              <!-- Expiry -->
-              <table
-                width="100%"
-                cellpadding="0"
-                cellspacing="0"
-                border="0"
-                style="
-                  background:#fafafa;
-                  border-radius:12px;
-                  margin-bottom:24px;
-                "
-              >
-                <tr>
-
-                  <td
-                    width="35"
-                    valign="top"
-                    style="
-                      padding:15px 0 15px 15px;
-                      font-size:17px;
-                    "
-                  >
-                    ⏱
-                  </td>
-
-                  <td
-                    style="
-                      padding:14px 15px 14px 8px;
-                      color:#555555;
-                      font-size:13px;
-                      line-height:1.5;
-                    "
-                  >
-                    <strong style="color:#333333;">
-                      ${copy.expiresStrong}
-                    </strong>
-                    <br />
-                    ${copy.expiresNote}
-                  </td>
-
-                </tr>
-              </table>
-
-              <p
-                style="
-                  margin:0 0 4px;
-                  color:#333333;
-                  font-size:13px;
-                  font-weight:700;
-                "
-              >
-                ${copy.cantFind}
-              </p>
-
-              <p
-                style="
-                  margin:0;
-                  color:#888888;
-                  font-size:12.5px;
-                  line-height:1.6;
-                "
-              >
-                ${copy.cantFindNote}
-              </p>
-
-              <p
-                style="
-                  margin:16px 0 0;
-                  color:#888888;
-                  font-size:13px;
-                  line-height:1.6;
-                "
-              >
-                ${copy.didntRequest}
-              </p>
-
+          <!-- Content: secondary language block -->
+          <tr>
+            <td
+              style="
+                padding:8px 38px 35px;
+                background:#ffffff;
+              "
+            >
+${renderHtmlBlock(secondary, otp, firstName)}
             </td>
           </tr>
 
@@ -493,9 +508,9 @@ ${copy.footerMaking}
                   line-height:1.6;
                 "
               >
-                ${copy.footerTagline}
+                ${primary.footerTagline}
                 <br />
-                ${copy.footerMaking}
+                ${primary.footerMaking}
               </div>
 
               <div
@@ -507,7 +522,7 @@ ${copy.footerMaking}
                   font-size:11px;
                 "
               >
-                ${copy.automated}
+                ${primary.automated}
               </div>
 
             </td>
