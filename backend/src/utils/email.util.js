@@ -54,15 +54,15 @@ function getTransporter() {
 // signing up, since there's no user record yet to read a preference from.
 const OTP_EMAIL_COPY = {
   en: {
-    subject: (otp) => `${otp} — Your SmartCity verification code`,
-    subjectLabel: "Your SmartCity verification code",
+    subject: (otp) => `${otp} — Your Samadhan verification code`,
+    subjectLabel: "Your Samadhan verification code",
     headlineLine1: "Let's make",
     headlineLine2: "Kolkata better.",
     tagline: "Your city. Your voice.",
     eyebrow: "Email verification",
     title: "Verify your email",
     intro: (firstName) =>
-      `Hi ${firstName}, you're almost there. Use the verification code below to continue with your SmartCity account.`,
+      `Hi ${firstName}, you're almost there. Use the verification code below to continue with your Samadhan account.`,
     codeLabel: "Your verification code",
     expiresStrong: "This code expires in 10 minutes.",
     expiresNote: "For your security, never share your verification code with anyone.",
@@ -74,21 +74,21 @@ const OTP_EMAIL_COPY = {
     footerMaking: "Making civic services simpler, one report at a time.",
     automated: "This is an automated message. Please do not reply to this email.",
     textGreeting: (firstName) => `Hi ${firstName},`,
-    textIntro: "Use the verification code below to continue with your SmartCity account:",
+    textIntro: "Use the verification code below to continue with your Samadhan account:",
     textExpiry: "This code is valid for 10 minutes.",
     textSecurity: "For your security, please do not share this code with anyone.",
     textIgnore: "If you didn't request this verification code, you can safely ignore this email.",
   },
   bn: {
-    subject: (otp) => `${otp} — আপনার SmartCity যাচাইকরণ কোড`,
-    subjectLabel: "আপনার SmartCity যাচাইকরণ কোড",
+    subject: (otp) => `${otp} — আপনার সমাধান যাচাইকরণ কোড`,
+    subjectLabel: "আপনার সমাধান যাচাইকরণ কোড",
     headlineLine1: "আসুন",
     headlineLine2: "কলকাতাকে আরও ভালো করি।",
     tagline: "আপনার শহর। আপনার কণ্ঠস্বর।",
     eyebrow: "ইমেল যাচাইকরণ",
     title: "আপনার ইমেল যাচাই করুন",
     intro: (firstName) =>
-      `হ্যালো ${firstName}, আপনি প্রায় শেষ পর্যায়ে। আপনার SmartCity অ্যাকাউন্ট চালিয়ে যেতে নিচের যাচাইকরণ কোডটি ব্যবহার করুন।`,
+      `হ্যালো ${firstName}, আপনি প্রায় শেষ পর্যায়ে। আপনার সমাধান অ্যাকাউন্ট চালিয়ে যেতে নিচের যাচাইকরণ কোডটি ব্যবহার করুন।`,
     codeLabel: "আপনার যাচাইকরণ কোড",
     expiresStrong: "এই কোডের মেয়াদ ১০ মিনিটে শেষ হবে।",
     expiresNote: "নিরাপত্তার জন্য, আপনার যাচাইকরণ কোড কারো সাথে শেয়ার করবেন না।",
@@ -100,7 +100,7 @@ const OTP_EMAIL_COPY = {
     footerMaking: "নাগরিক পরিষেবা সহজ করা, একটি রিপোর্ট এ একবার।",
     automated: "এটি একটি স্বয়ংক্রিয় বার্তা। অনুগ্রহ করে এই ইমেলের উত্তর দেবেন না।",
     textGreeting: (firstName) => `হ্যালো ${firstName},`,
-    textIntro: "আপনার SmartCity অ্যাকাউন্ট চালিয়ে যেতে নিচের যাচাইকরণ কোডটি ব্যবহার করুন:",
+    textIntro: "আপনার সমাধান অ্যাকাউন্ট চালিয়ে যেতে নিচের যাচাইকরণ কোডটি ব্যবহার করুন:",
     textExpiry: "এই কোডটি ১০ মিনিটের জন্য বৈধ।",
     textSecurity: "নিরাপত্তার জন্য, অনুগ্রহ করে এই কোডটি কারো সাথে শেয়ার করবেন না।",
     textIgnore: "যদি আপনি এই যাচাইকরণ কোডটি অনুরোধ না করে থাকেন, তাহলে আপনি নিশ্চিন্তে এই ইমেলটি উপেক্ষা করতে পারেন।",
@@ -282,7 +282,7 @@ export async function sendOtpEmail({ to, otp, name, lang }) {
   const messageId = `<${crypto.randomUUID()}@${senderDomain}>`;
 
   await getTransporter().sendMail({
-    from: `SmartCity Portal <${senderAddress}>`,
+    from: `Samadhan <${senderAddress}>`,
     to,
     replyTo: senderAddress,
     // Ties the envelope sender to the same domain as the header From —
@@ -304,7 +304,7 @@ export async function sendOtpEmail({ to, otp, name, lang }) {
     },
 
     text: `
-SmartCity Portal
+Samadhan
 ${primary.tagline}
 
 ${renderTextBlock(primary, otp, firstName)}
@@ -313,7 +313,7 @@ ${renderTextBlock(primary, otp, firstName)}
 
 ${renderTextBlock(secondary, otp, firstName)}
 
-SmartCity Portal
+Samadhan
 ${primary.footerMaking}
     `,
 
@@ -323,7 +323,7 @@ ${primary.footerMaking}
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SmartCity Verification</title>
+  <title>Samadhan Verification</title>
 </head>
 
 <!-- No @import/web font here on purpose — Gmail, Outlook desktop, and
@@ -394,20 +394,7 @@ ${primary.footerMaking}
                       letter-spacing:-0.5px;
                     "
                   >
-                    SmartCity
-                  </td>
-
-                  <td
-                    align="right"
-                    style="
-                      color:#ffffff;
-                      font-size:12px;
-                      font-weight:700;
-                      letter-spacing:1px;
-                      text-transform:uppercase;
-                    "
-                  >
-                    Portal
+                    Samadhan
                   </td>
 
                 </tr>
@@ -498,7 +485,7 @@ ${renderHtmlBlock(secondary, otp, firstName)}
                   margin-bottom:7px;
                 "
               >
-                SmartCity Portal
+                Samadhan
               </div>
 
               <div
