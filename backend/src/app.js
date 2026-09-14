@@ -14,9 +14,13 @@ import { env } from "./config/env.js";
 
 const app = express();
 
+// FRONTEND_URLS accepts a comma-separated list so multiple live domains
+// (e.g. an old and a renamed Vercel project alias both still routing
+// traffic) can be whitelisted without a code change — set FRONTEND_URLS
+// instead of FRONTEND_URL when that's the case.
 const allowedOrigins = [
   "http://localhost:5173",
-  env.frontendUrl,
+  ...env.frontendUrls,
 ].filter(Boolean);
 
 app.use(
