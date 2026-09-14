@@ -41,6 +41,8 @@ const resources = {
       language_invalid: 'Language must be "en" or "bn"',
       invalid_status: 'Invalid status',
       password_min: 'Password must be at least 6 characters',
+      resolution_photo_required: 'A photo is required to resolve this grievance',
+      resolution_location_required: 'Location could not be captured for the resolution photo',
     },
     grievance: {
       create_success: 'Grievance submitted',
@@ -51,6 +53,9 @@ const resources = {
       status_updated: 'Status updated',
       fetch_all_failed: 'Could not load grievances.',
       update_status_failed: 'Could not update the grievance status.',
+      resolve_success: 'Grievance marked as resolved',
+      missing_original_location: 'This grievance has no reported location on file, so a resolution photo cannot be location-verified.',
+      location_mismatch: 'You are about {{distance}}m from the reported location. Move within {{threshold}}m of the site and try again.',
     },
     assistant: {
       not_configured: 'AI assistant is not configured. Ask the administrator to set GROQ_API_KEY.',
@@ -93,6 +98,8 @@ const resources = {
       language_invalid: 'ভাষা অবশ্যই "en" অথবা "bn" হতে হবে',
       invalid_status: 'অবৈধ স্ট্যাটাস',
       password_min: 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে',
+      resolution_photo_required: 'এই অভিযোগটি সমাধান করতে একটি ছবি আবশ্যক',
+      resolution_location_required: 'সমাধানের ছবির জন্য অবস্থান শনাক্ত করা যায়নি',
     },
     grievance: {
       create_success: 'অভিযোগ জমা দেওয়া হয়েছে',
@@ -103,6 +110,9 @@ const resources = {
       status_updated: 'স্ট্যাটাস আপডেট করা হয়েছে',
       fetch_all_failed: 'অভিযোগ লোড করা যায়নি।',
       update_status_failed: 'অভিযোগের স্ট্যাটাস আপডেট করা যায়নি।',
+      resolve_success: 'অভিযোগটি সমাধান হয়েছে বলে চিহ্নিত করা হয়েছে',
+      missing_original_location: 'এই অভিযোগে কোনো রিপোর্ট করা অবস্থান নেই, তাই সমাধানের ছবিটি অবস্থান-যাচাই করা যাবে না।',
+      location_mismatch: 'আপনি রিপোর্ট করা অবস্থান থেকে প্রায় {{distance}} মিটার দূরে আছেন। সাইটের {{threshold}} মিটারের মধ্যে গিয়ে আবার চেষ্টা করুন।',
     },
     assistant: {
       not_configured: 'AI অ্যাসিস্ট্যান্ট কনফিগার করা নেই। প্রশাসককে GROQ_API_KEY সেট করতে বলুন।',
@@ -128,9 +138,10 @@ await i18next.init({
  * Translate a message key for a given language, falling back to English.
  * @param {string} key
  * @param {'en'|'bn'} lang
+ * @param {Record<string, unknown>} [options] interpolation values, e.g. { distance: 340 }
  */
-export function t(key, lang = 'en') {
-  return i18next.t(key, { lng: lang });
+export function t(key, lang = 'en', options = {}) {
+  return i18next.t(key, { lng: lang, ...options });
 }
 
 export default i18next;

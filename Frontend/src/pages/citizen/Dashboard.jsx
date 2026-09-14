@@ -232,7 +232,7 @@ export default function Dashboard() {
                       data-label={t('dashboard.table.issue')}
                       className="title-cell"
                     >
-                      {g.title}
+                      <Link to={`/grievance/${g.id}`}>{g.title}</Link>
                     </td>
 
                     <td data-label={t('dashboard.table.category')}>

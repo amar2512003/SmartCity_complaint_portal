@@ -932,3 +932,141 @@ button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
   pointer-events: none;
   user-select: none;
 }
+/* =========================================
+   RESOLVE-WITH-VERIFICATION MODAL
+   ========================================= */
+
+.resolve-modal-card {
+  position: relative;
+  width: min(480px, 100%);
+  max-height: 88vh;
+  overflow-y: auto;
+  background: var(--paper);
+  border-radius: 20px;
+  padding: 28px 24px 24px;
+  box-shadow: 0 30px 80px rgba(0,0,0,.35);
+}
+.resolve-modal-card h3 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 21px;
+  margin: 0 0 6px;
+  padding-right: 30px;
+}
+.resolve-modal-subtitle {
+  color: var(--muted);
+  font-size: 13.5px;
+  line-height: 1.6;
+  margin: 0 0 18px;
+}
+.resolve-modal-close {
+  background: rgba(0,0,0,.06);
+  color: var(--ink);
+}
+.resolve-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+}
+@media (max-width: 560px) {
+  .resolve-modal-card { padding: 22px 16px 18px; border-radius: 16px; }
+  .resolve-modal-footer button { flex: 1; min-height: 46px; }
+}
+
+/* =========================================
+   CITIZEN GRIEVANCE DETAIL — BEFORE/AFTER
+   ========================================= */
+
+.grievance-detail-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+  margin: 4px 0 16px;
+}
+.grievance-detail-head span {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 4px;
+}
+.grievance-detail-description {
+  color: #5c4c40;
+  line-height: 1.7;
+  margin: 0 0 18px;
+}
+.grievance-detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: center;
+  margin-bottom: 26px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--line);
+}
+.before-after-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+.before-after-card {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+}
+.before-after-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.before-after-timestamp {
+  font-size: 12px;
+  color: var(--muted);
+}
+.before-after-pending {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 26px 12px;
+  border: 1px dashed var(--line);
+  border-radius: 14px;
+  width: 100%;
+  text-align: center;
+}
+.before-after-pending p {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+@media (max-width: 640px) {
+  .before-after-grid { grid-template-columns: 1fr; }
+  .grievance-detail-head { flex-direction: column; }
+}
+
+/* =========================================
+   LANGUAGE TOGGLE — BELOW MAIN HEADER
+   ========================================= */
+
+/* On the citizen/admin app shells the toggle sits in its own slim strip
+   right under the sticky header, instead of floating inside the nav row.
+   .lang-toggle is position:absolute by default (needed on the auth pages,
+   which have no header bar) — reset that here so it lays out normally. */
+.lang-toggle-bar {
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+}
+.lang-toggle-bar-inner {
+  width: min(1180px, calc(100% - 40px));
+  margin: auto;
+  padding: 10px 0;
+  display: flex;
+  justify-content: flex-end;
+}
+.lang-toggle-bar .lang-toggle {
+  position: static;
+}
+@media (max-width: 640px) {
+  .lang-toggle-bar-inner { justify-content: center; padding: 8px 0; }
+}

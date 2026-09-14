@@ -4,6 +4,7 @@ import { getAllGrievances, updateStatus } from '../../api/grievance.api';
 import PhotoThumb from '../../components/PhotoThumb';
 import MapLink from '../../components/MapLink';
 import MunicipalBadge from '../../components/MunicipalBadge';
+import ResolveGrievanceModal from '../../components/ResolveGrievanceModal';
 
 const WEST_BENGAL_DISTRICTS = [
   'Alipurduar',
@@ -36,6 +37,7 @@ export default function AdminDashboard() {
   const [items, setItems] = useState([]);
   const [selectedDistrict, setSelectedDistrict] = useState(ALL_DISTRICTS);
   const [msg, setMsg] = useState('');
+  const [resolvingId, setResolvingId] = useState(null);
 
   const load = async () => {
     try {
@@ -53,12 +55,21 @@ export default function AdminDashboard() {
   }, []);
 
   const change = async (id, status) => {
+    if (status === 'resolved') {
+      setResolvingId(id);
+      return;
+    }
     try {
       await updateStatus(id, status);
       load();
     } catch (e) {
       setMsg(t('dashboard.updateError'));
     }
+  };
+
+  const handleResolved = () => {
+    setResolvingId(null);
+    load();
   };
 
   // Filter grievances according to selected district
@@ -207,6 +218,7 @@ export default function AdminDashboard() {
                   <th>{t('dashboard.table.location')}</th>
                   <th>{t('dashboard.table.notify')}</th>
                   <th>{t('dashboard.table.status')}</th>
+                  <th>{t('dashboard.table.resolutionPhoto')}</th>
                   <th>{t('dashboard.table.update')}</th>
                 </tr>
               </thead>
@@ -258,6 +270,10 @@ export default function AdminDashboard() {
                     </td>
 
                     <td>
+                      <PhotoThumb src={g.resolution_photo} />
+                    </td>
+
+                    <td>
                       <select
                         className="select-status"
                         value={g.status}
@@ -289,6 +305,14 @@ export default function AdminDashboard() {
           </div>
         )}
       </div>
+
+      {resolvingId && (
+        <ResolveGrievanceModal
+          grievanceId={resolvingId}
+          onClose={() => setResolvingId(null)}
+          onResolved={handleResolved}
+        />
+      )}
     </>
   );
 }

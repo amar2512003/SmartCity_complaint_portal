@@ -142,8 +142,13 @@
   "grievanceDetail": {
     "reportNumber": "Report #{{id}}",
     "heading": "Grievance details",
-    "comingSoon": "Detailed view coming soon",
-    "comingSoonText": "You can already track this report's status, photo, location, and routing from the main dashboard.",
+    "loading": "Loading report…",
+    "notFound": "We couldn't find that report.",
+    "loadError": "Could not load this report. Please try again.",
+    "beforePhoto": "Reported (before)",
+    "afterPhoto": "Resolved (after)",
+    "resolvedOn": "Resolved on {{date}}",
+    "notResolvedYet": "Not resolved yet",
     "backToDashboard": "← Back to dashboard"
   },
   "photoCapture": {

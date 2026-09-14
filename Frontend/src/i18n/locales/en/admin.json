@@ -48,11 +48,25 @@
       "location": "Location",
       "notify": "Notify",
       "status": "Status",
+      "resolutionPhoto": "After",
       "update": "Update"
     }
   },
   "grievanceManage": {
     "heading": "Grievance Management",
     "text": "Management controls are available on the admin dashboard."
+  },
+  "resolveModal": {
+    "heading": "Verify & resolve",
+    "subtitle": "Take a photo on-site to confirm the issue is fixed. We'll check that your location matches where the citizen reported it before marking this resolved.",
+    "photoLabel": "Resolution photo",
+    "cancel": "Cancel",
+    "confirm": "Confirm resolution",
+    "submitting": "Verifying…",
+    "close": "Close",
+    "errors": {
+      "photoRequired": "Take a photo with location enabled to resolve this grievance.",
+      "submitFailed": "Could not resolve this grievance. Please try again."
+    }
   }
 }
