@@ -189,5 +189,35 @@
     "connectionError": "Couldn't reach the assistant. Please try again.",
     "openFabAria": "Open AI assistant",
     "closeFabAria": "Close AI assistant"
+  },
+  "instructions": {
+    "openFabAria": "How it works",
+    "closeFabAria": "Close instructions",
+    "title": "How Samadhan Works",
+    "subtitle": "A quick guide, step by step",
+    "closeAria": "Close instructions panel",
+    "steps": [
+      {
+        "heading": "1. Sign in with an email OTP",
+        "body": "Enter your email address and we'll send a one-time code to your inbox. Enter that code to sign in — no password needed."
+      },
+      {
+        "heading": "2. Submit your grievance",
+        "body": "Once signed in, click \"Report Issue\", describe the problem, add a photo, and submit."
+      },
+      {
+        "heading": "3. Your location is captured automatically",
+        "body": "The portal automatically records the location of the grievance and creates a Google Maps link to the address, so the exact spot is clear."
+      },
+      {
+        "heading": "4. Routed to the nearest municipal body",
+        "body": "Your grievance, along with the map link, is sent to the municipal body responsible for that area for resolution."
+      },
+      {
+        "heading": "5. Resolution is verified on-site",
+        "body": "An admin visits the location and takes a photo after fixing the issue. The grievance can only be marked \"Resolved\" if that photo's location matches the original address."
+      }
+    ],
+    "footer": "You can track the live status of every grievance you've filed from your Dashboard."
   }
 }

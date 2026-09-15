@@ -66,6 +66,22 @@
 .ai-close{border:0;background:none;color:var(--muted);font-size:14px;width:28px;height:28px;border-radius:8px}
 .ai-close:hover{background:var(--primary-light);color:var(--primary-dark)}
 .ai-body{flex:1;overflow-y:auto;padding:16px 14px;display:flex;flex-direction:column;gap:10px;background:#fffaf5}
+
+/* Instructions guide (desktop) — mirrors .ai-assistant but pinned to the left so the two fabs never overlap */
+.instructions-guide{position:fixed !important;left:22px;bottom:22px;z-index:9999;display:flex;flex-direction:column;align-items:flex-start;gap:14px}
+.instructions-fab{width:58px;height:58px;border-radius:50%;border:0;background:linear-gradient(135deg,#2a6f5a,#3f9c80);color:#fff;font-size:22px;font-weight:800;box-shadow:0 14px 34px rgba(42,111,90,.35);display:grid;place-items:center;transition:.2s}
+.instructions-fab:hover{transform:translateY(-2px) scale(1.03)}
+.instructions-panel{width:min(370px,calc(100vw - 40px));max-height:min(560px,calc(100vh - 140px));display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 60px rgba(20,50,40,.22)}
+.instructions-panel-head{display:flex;align-items:center;justify-content:space-between;padding:16px 16px;border-bottom:1px solid var(--line);background:linear-gradient(135deg,#f0faf6,#fff)}
+.instructions-panel-title{display:flex;align-items:center;gap:10px}
+.instructions-panel-title strong{display:block;font-size:14px}
+.instructions-panel-title span{display:block;font-size:11px;color:var(--muted);margin-top:2px}
+.instructions-avatar{width:34px;height:34px;border-radius:10px;background:linear-gradient(140deg,#2a6f5a,#3f9c80);color:#fff;display:grid;place-items:center;font-size:17px;font-weight:800;flex:none}
+.instructions-body{flex:1;overflow-y:auto;padding:16px 18px;background:#fffefb}
+.instructions-steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px}
+.instructions-step-heading{font-size:13.5px;font-weight:800;color:#1f4f40;margin-bottom:3px}
+.instructions-step-body{margin:0;font-size:13px;line-height:1.55;color:#5c554d}
+.instructions-footer{margin:16px 0 0;padding-top:12px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);line-height:1.5}
 .ai-bubble{max-width:84%;padding:10px 13px;border-radius:14px;font-size:13.5px;line-height:1.55;white-space:pre-wrap}
 .ai-bubble.assistant{align-self:flex-start;background:#fff;border:1px solid var(--line);border-bottom-left-radius:4px}
 .ai-bubble.user{align-self:flex-end;background:linear-gradient(135deg,var(--primary),#ff8a3d);color:#fff;border-bottom-right-radius:4px}
@@ -247,6 +263,11 @@ button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
   /* AI assistant */
   .ai-assistant { right: 12px; bottom: max(12px, env(safe-area-inset-bottom)); }
   .ai-fab { width: 54px; height: 54px; }
+
+  /* Instructions guide */
+  .instructions-guide { left: 12px; bottom: max(12px, env(safe-area-inset-bottom)); }
+  .instructions-fab { width: 54px; height: 54px; }
+  .instructions-panel { width: calc(100vw - 24px); max-height: min(70vh, 520px); }
   .ai-panel {
     position: fixed;
     left: 10px; right: 10px;
