@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { assignMunicipalBody } from '../utils/municipalBody';
+import GoogleMapPreview from './GoogleMapPreview';
 
 function formatCoord(n) { return Math.abs(n).toFixed(5) + '°'; }
 function coordLabel(lat, lng) {
@@ -242,7 +243,8 @@ export default function PhotoCapture({ value, onChange, onLocationChange, label,
           {geoStatus === 'locating' && <>📡 {t('photoCapture.gettingLocation')}</>}
           {geoStatus === 'ready' && geo && (
             <div>
-              <div>📍 {geo.address || coordLabel(geo.lat, geo.lng)}</div>
+              <GoogleMapPreview lat={geo.lat} lng={geo.lng} alt={geo.address || coordLabel(geo.lat, geo.lng)} />
+              <div className="geo-address-line">📍 {geo.address || coordLabel(geo.lat, geo.lng)}</div>
               <span>{t('photoCapture.geoSummary', { coord: coordLabel(geo.lat, geo.lng), accuracy: Math.round(geo.accuracy) })}</span>
               {geo.muni?.municipalBody && geo.muni?.confidence !== 'district' && (
                 <div className="muni-line">🏛 {t('photoCapture.notify')} <strong>{geo.muni.municipalBody}</strong></div>
