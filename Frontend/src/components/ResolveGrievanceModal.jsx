@@ -58,7 +58,7 @@ export default function ResolveGrievanceModal({ grievanceId, onClose, onResolved
         <h3>{t('resolveModal.heading')}</h3>
         <p className="resolve-modal-subtitle">{t('resolveModal.subtitle')}</p>
 
-        <PhotoCapture
+        <PhotoCapture allowCorrection={false}
           value={photo}
           onChange={setPhoto}
           onLocationChange={setLoc}

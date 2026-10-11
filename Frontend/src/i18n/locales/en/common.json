@@ -36,6 +36,9 @@
     "districtVerifyTooltip": "Multiple bodies in this district — verify from the address/photo",
     "districtVerify": "{{district}} — verify",
     "close": "Close",
-    "reportedIssuePhoto": "Reported issue photo"
+    "reportedIssuePhoto": "Reported issue photo",
+    "mapPreview": "Issue location on Google Maps",
+    "routingReview": "Municipality needs review",
+    "manuallyCorrected": "Location corrected by reporter"
   }
 }

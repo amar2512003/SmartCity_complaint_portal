@@ -75,7 +75,7 @@ export default function GrievanceDetail() {
           <p className="grievance-detail-description">{grievance.description}</p>
 
           <div className="grievance-detail-meta">
-            <MapLink lat={grievance.latitude} lng={grievance.longitude} address={grievance.location_address} />
+            <MapLink source={grievance.location_source} lat={grievance.latitude} lng={grievance.longitude} address={grievance.location_address} />
             <MunicipalBadge body={grievance.municipal_body} district={grievance.municipal_district} />
           </div>
 

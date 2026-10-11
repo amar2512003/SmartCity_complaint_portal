@@ -36,6 +36,9 @@
     "districtVerifyTooltip": "এই জেলায় একাধিক সংস্থা রয়েছে — ঠিকানা/ছবি থেকে যাচাই করুন",
     "districtVerify": "{{district}} — যাচাই করুন",
     "close": "বন্ধ করুন",
-    "reportedIssuePhoto": "রিপোর্ট করা সমস্যার ছবি"
+    "reportedIssuePhoto": "রিপোর্ট করা সমস্যার ছবি",
+    "mapPreview": "Google Maps-এ সমস্যার অবস্থান",
+    "routingReview": "পৌরসভা যাচাই প্রয়োজন",
+    "manuallyCorrected": "অভিযোগকারী অবস্থান সংশোধন করেছেন"
   }
 }

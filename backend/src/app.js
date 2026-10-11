@@ -1,3 +1,8 @@
+import { Router } from 'express';
+import { z } from 'zod';
+import { verifyAuth } from './middleware/auth.middleware.js';
+import { validate } from './middleware/validate.middleware.js';
+import { routeMunicipality } from './utils/municipalRouting.js';
 import express from "express";
 import cors from "cors";
 
@@ -68,6 +73,13 @@ app.get("/api/health", (req, res) =>
 
 app.use("/api/auth/citizen", citizenAuth);
 app.use("/api/auth/admin", adminAuth);
+const locationRouter = Router();
+locationRouter.use(verifyAuth);
+locationRouter.post('/route', validate(z.object({
+  latitude: z.number().min(-90).max(90), longitude: z.number().min(-180).max(180),
+  locationAccuracy: z.number().nonnegative().nullable().optional(),
+})), (req, res) => res.json({ success: true, data: routeMunicipality(req.body.latitude, req.body.longitude, req.body.locationAccuracy) }));
+app.use('/api/location', locationRouter);
 app.use("/api/grievances", grievances);
 app.use("/api/admin", admin);
 app.use("/api/assistant", assistant);

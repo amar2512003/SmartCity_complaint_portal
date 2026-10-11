@@ -1,15 +1,20 @@
+import { routeMunicipality } from '../utils/municipalRouting.js';
 import { getDb, nextId, numericId, withoutMongoId, updatedDocument } from '../config/db.js';
 
 export async function createGrievance({ citizenId, title, description, category, photo, latitude, longitude,
-  locationAccuracy, locationAddress, municipalBody, municipalDistrict }) {
+  locationAccuracy, locationAddress, locationSource, capturedLatitude, capturedLongitude }) {
   const db = await getDb();
   const citizen = await db.collection('users').findOne({ id: numericId(citizenId), role: 'citizen' });
   if (!citizen) throw new Error('Citizen account not found');
+  const routing = routeMunicipality(latitude, longitude, locationAccuracy);
   const now = new Date();
   const grievance = { id: await nextId('grievances'), citizen_id: citizen.id, title, description, category,
     photo: photo || null, latitude: latitude ?? null, longitude: longitude ?? null,
     location_accuracy: locationAccuracy ?? null, location_address: locationAddress || null,
-    municipal_body: municipalBody || null, municipal_district: municipalDistrict || null, status: 'pending',
+    municipal_body: routing.municipalBody, municipal_district: routing.district,
+    routing_status: routing.confidence, routing_reason: routing.reason, routing_source: routing.source,
+    location_source: locationSource || 'device', captured_latitude: capturedLatitude === undefined ? latitude ?? null : capturedLatitude,
+    captured_longitude: capturedLongitude === undefined ? longitude ?? null : capturedLongitude, status: 'pending',
     resolution_photo: null, resolution_latitude: null, resolution_longitude: null, resolution_accuracy: null,
     resolution_address: null, resolution_distance_meters: null, resolved_at: null, resolved_by_admin_id: null,
     created_at: now, updated_at: now };

@@ -188,7 +188,7 @@ export default function Dashboard() {
                       data-label={t('dashboard.table.location')}
                       className="location-cell"
                     >
-                      <MapLink
+                      <MapLink source={g.location_source}
                         lat={g.latitude}
                         lng={g.longitude}
                         address={g.location_address}

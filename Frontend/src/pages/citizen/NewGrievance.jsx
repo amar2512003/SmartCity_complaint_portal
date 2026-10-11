@@ -68,6 +68,7 @@ export default function NewGrievance() {
 
   const [photo, setPhoto] = useState('');
   const [loc, setLoc] = useState(null);
+  const [locationBusy, setLocationBusy] = useState(false);
   const [msg, setMsg] = useState('');
   const [err, setErr] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -91,6 +92,9 @@ export default function NewGrievance() {
       return;
     }
 
+    if (locationBusy || !loc?.locationConfirmed) {
+      setErr(true); setMsg(t('photoCapture.confirmRequired')); return;
+    }
     setMsg('');
     setLoading(true);
 
@@ -319,6 +323,7 @@ export default function NewGrievance() {
                     value={photo}
                     onChange={setPhoto}
                     onLocationChange={setLoc}
+                    onBusyChange={setLocationBusy}
                     required
                   />
                 </div>
@@ -329,7 +334,7 @@ export default function NewGrievance() {
 
 
             {/* LOCATION CONFIRMATION */}
-            {loc && (
+            {loc?.locationConfirmed && (
               <div className="location-confirmation">
 
                 <div className="location-check">
@@ -364,7 +369,7 @@ export default function NewGrievance() {
               <button
                 className="primary-btn submit-report-btn"
                 type="submit"
-                disabled={loading}
+                disabled={loading || locationBusy}
               >
                 {loading ? (
                   t('grievanceForm.submitting')

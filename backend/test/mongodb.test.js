@@ -110,3 +110,23 @@ test('setup and admin seed scripts are repeatable and preserve existing credenti
   assert.equal((await users.findUserByEmail(env.ADMIN_EMAIL)).password_hash, first.password_hash);
   await assert.rejects(run(process.execPath, ['src/db/seed.js'], { cwd, env: { ...env, ADMIN_EMAIL: 'citizen0@test.local' } }));
 });
+
+test('routing API validates coordinates and complaint creation overrides forged municipality labels', async () => {
+  const citizen = await users.createUser({ name: 'Location test', email: 'location@test.local' });
+  const token = signToken(citizen);
+  const body = { latitude: 22.657, longitude: 88.365, locationAccuracy: 5 };
+  assert.equal((await request('/location/route', { method: 'POST', body })).status, 401);
+  assert.equal((await request('/location/route', { method: 'POST', token, body: { ...body, latitude: 999 } })).status, 422);
+  assert.equal((await request('/location/route', { method: 'POST', token, body })).body.data.municipalBody, 'Kamarhati Municipality');
+  const result = await request('/grievances', { method: 'POST', token, body: {
+    ...body, title: 'Routing test', description: 'Boundary based routing', category: 'Road', photo: 'data:image/jpeg;base64,test',
+    municipalBody: 'Bally Municipality', municipalDistrict: 'Howrah', locationSource: 'manual',
+    capturedLatitude: 22.65306, capturedLongitude: 88.34413,
+  } });
+  assert.equal(result.status, 200);
+  assert.equal(result.body.data.municipal_body, 'Kamarhati Municipality');
+  assert.equal(result.body.data.municipal_district, 'North 24 Parganas');
+  assert.equal(result.body.data.routing_status, 'boundary');
+  assert.equal(result.body.data.location_source, 'manual');
+  assert.equal(result.body.data.captured_longitude, 88.34413);
+});

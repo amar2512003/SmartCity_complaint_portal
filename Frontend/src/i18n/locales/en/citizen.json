@@ -161,7 +161,7 @@
     "clickPicture": "Click a picture",
     "cameraUnavailable": "Camera unavailable. You can upload a picture instead.",
     "gettingLocation": "Getting your location…",
-    "geoSummary": "{{coord}} · ±{{accuracy}}m · via OpenStreetMap",
+    "geoSummary": "{{coord}} · device accuracy ±{{accuracy}}m",
     "capturedEvidenceAlt": "Captured evidence",
     "notify": "Notify:",
     "districtLevelNote": "(district-level match — please verify address)",
@@ -177,7 +177,20 @@
     "addressFound": "Address found",
     "locationUnavailable": "Location unavailable",
     "switchCamera": "Switch camera",
-    "capturePhotoAria": "Capture photo"
+    "capturePhotoAria": "Capture photo",
+    "manualLocation": "Manually corrected report location. Any coordinate stamp on the photo records the original capture.",
+    "routedTo": "Assigned municipality:",
+    "reviewRouting": "Municipality needs review: the location is outside verified coverage or too close to a boundary.",
+    "checkPin": "Check the map marker. Device location can be wrong, especially on a desktop. Uploaded photos use your current device location, not photo metadata.",
+    "confirmPin": "The map marker matches the issue location",
+    "refreshLocation": "Get fresh GPS location",
+    "correctLocation": "Location wrong? Correct coordinates",
+    "coordinateHelp": "Open Google Maps, drop a pin on the issue, then copy its latitude and longitude here. The backend will recalculate the municipality.",
+    "latitude": "Latitude",
+    "longitude": "Longitude",
+    "invalidCoordinates": "Enter valid latitude (−90 to 90) and longitude (−180 to 180).",
+    "applyLocation": "Update map and municipality",
+    "confirmRequired": "Check and confirm the issue location on the map before submitting."
   },
   "assistant": {
     "title": "Citizen Desk Assistant",
@@ -211,8 +224,8 @@
         "body": "The portal automatically records the location of the grievance and creates a Google Maps link to the address, so the exact spot is clear."
       },
       {
-        "heading": "4. Routed to the nearest municipal body",
-        "body": "Your grievance, along with the map link, is sent to the municipal body responsible for that area for resolution."
+        "heading": "4. Routed by municipal boundary",
+        "body": "The backend checks the report coordinates against municipal boundaries. Uncertain locations stay in the admin queue for review."
       },
       {
         "heading": "5. Resolution is verified on-site",

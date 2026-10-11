@@ -251,7 +251,7 @@ export default function AdminDashboard() {
                     </td>
 
                     <td data-label={t('dashboard.table.location')}>
-                      <MapLink
+                      <MapLink source={g.location_source}
                         lat={g.latitude}
                         lng={g.longitude}
                         address={g.location_address}

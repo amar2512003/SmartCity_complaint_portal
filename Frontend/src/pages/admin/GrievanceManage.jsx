@@ -59,7 +59,7 @@ export default function GrievanceManage() {
             <strong>{report.citizen_name}</strong>
           </p>
           <div className="grievance-detail-meta">
-            <MapLink
+            <MapLink source={report.location_source}
               lat={report.latitude}
               lng={report.longitude}
               address={report.location_address}

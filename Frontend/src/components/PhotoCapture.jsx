@@ -1,7 +1,7 @@
 import useDialog from '../hooks/useDialog';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { assignMunicipalBody } from '../utils/municipalBody';
+import api from '../api/axiosInstance';
 import GoogleMapPreview from './GoogleMapPreview';
 
 function formatCoord(n) { return Math.abs(n).toFixed(5) + '°'; }
@@ -125,7 +125,7 @@ function toStampedDataUrl(source, sw, sh, geo, maxWidth = 1024, quality = 0.75) 
   return canvas.toDataURL('image/jpeg', quality);
 }
 
-export default function PhotoCapture({ value, onChange, onLocationChange, label, required = false }) {
+export default function PhotoCapture({ value, onChange, onLocationChange, label, required = false, onBusyChange, allowCorrection = true }) {
   const { t } = useTranslation('citizen');
   const displayLabel = label ?? t('photoCapture.label');
 
@@ -139,41 +139,76 @@ export default function PhotoCapture({ value, onChange, onLocationChange, label,
   const [geoStatus, setGeoStatus] = useState('idle'); // idle | locating | ready | error
   const videoRef = useRef(null);
   const fileInputRef = useRef(null);
+  const locationRequest = useRef(0);
+  const fileRequest = useRef(0);
+  const [manual, setManual] = useState(false);
+  const [coordinates, setCoordinates] = useState({ lat: '', lng: '' });
+  const [coordinateError, setCoordinateError] = useState(false);
+  const [confirmed, setConfirmed] = useState(false);
   const geoRef = useRef(null); // latest geo, read synchronously at capture time
 
   const stopStream = () => { streamRef.current?.getTracks().forEach(track => track.stop()); streamRef.current = null; };
 
+  useEffect(() => () => { ++locationRequest.current; ++fileRequest.current; }, []);
+
+  const locationPayload = (full, locationConfirmed = false) => ({
+    latitude: full.lat, longitude: full.lng, locationAccuracy: full.accuracy,
+    locationAddress: full.address || null, locationSource: full.source,
+    capturedLatitude: full.capturedLat, capturedLongitude: full.capturedLng,
+    locationConfirmed,
+  });
+
+  const resolveLocation = async (base, request) => {
+    const [geocoded, routing] = await Promise.all([
+      reverseGeocode(base.lat, base.lng),
+      api.post('/location/route', { latitude: base.lat, longitude: base.lng, locationAccuracy: base.accuracy }, { timeout: 8000 })
+        .then(r => r.data.data).catch(() => ({ confidence: 'review', reason: 'unavailable' })),
+    ]);
+    if (request !== locationRequest.current) return null;
+    const full = { ...base, address: geocoded?.formatted || '', muni: routing };
+    geoRef.current = full; setGeo(full); setGeoStatus('ready');
+    setCoordinates({ lat: String(full.lat), lng: String(full.lng) });
+    onLocationChange?.(locationPayload(full)); onBusyChange?.(false);
+    return full;
+  };
+
   const locate = () => new Promise(resolve => {
-    if (!navigator.geolocation) { setGeoStatus('error'); resolve(null); return; }
-    setGeoStatus('locating');
+    const request = ++locationRequest.current;
+    setConfirmed(false); geoRef.current = null; setGeo(null); onLocationChange?.(null);
+    if (!navigator.geolocation) { setGeoStatus('error'); onBusyChange?.(false); resolve(null); return; }
+    setGeoStatus('locating'); onBusyChange?.(true);
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
+        if (request !== locationRequest.current) { resolve(null); return; }
         const base = {
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude,
-          accuracy: pos.coords.accuracy,
-          timestamp: new Date().toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }),
-          address: '',
+          lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy,
+          capturedLat: pos.coords.latitude, capturedLng: pos.coords.longitude, source: 'device',
+          timestamp: new Date().toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }), address: '',
         };
-        geoRef.current = base; setGeo(base); // show coordinates immediately while address resolves
-        const geocoded = await reverseGeocode(base.lat, base.lng);
-        const muni = assignMunicipalBody(geocoded?.address);
-        const full = { ...base, address: geocoded?.formatted || '', muni };
-        geoRef.current = full; setGeo(full); setGeoStatus('ready');
-        onLocationChange?.({
-          latitude: full.lat,
-          longitude: full.lng,
-          locationAccuracy: full.accuracy,
-          locationAddress: full.address || null,
-          municipalBody: muni.municipalBody || null,
-          municipalDistrict: muni.district || null,
-        });
-        resolve(full);
+        geoRef.current = base; setGeo(base);
+        resolve(await resolveLocation(base, request));
       },
-      () => { geoRef.current = null; setGeoStatus('error'); onLocationChange?.(null); resolve(null); },
-      { enableHighAccuracy: true, timeout: 12000, maximumAge: 30000 }
+      () => {
+        if (request === locationRequest.current) {
+          geoRef.current = null; setGeoStatus('error'); onLocationChange?.(null); onBusyChange?.(false);
+        }
+        resolve(null);
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
     );
   });
+
+  const applyCoordinates = async () => {
+    const lat = Number(coordinates.lat), lng = Number(coordinates.lng);
+    if (!coordinates.lat.trim() || !coordinates.lng.trim() || !Number.isFinite(lat) || !Number.isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180) { setCoordinateError(true); return; }
+    setCoordinateError(false); setConfirmed(false); setManual(false);
+    const previous = geoRef.current;
+    setGeoStatus('locating'); onBusyChange?.(true); onLocationChange?.(null);
+    await resolveLocation({ lat, lng, accuracy: null, source: 'manual',
+      capturedLat: previous?.capturedLat ?? null, capturedLng: previous?.capturedLng ?? null,
+      timestamp: new Date().toLocaleString(), address: '',
+    }, ++locationRequest.current);
+  };
 
   const startCamera = async (mode = facing) => {
     setCamError(''); setStarting(true);
@@ -207,12 +242,15 @@ export default function PhotoCapture({ value, onChange, onLocationChange, label,
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) return;
+    const fileGeneration = ++fileRequest.current;
     const location = locate();
+    const locationGeneration = locationRequest.current;
     const img = new Image();
     const reader = new FileReader();
     reader.onload = () => {
       img.onload = async () => {
         const capturedLocation = await location;
+        if (fileGeneration !== fileRequest.current || locationGeneration !== locationRequest.current) return;
         onChange(toStampedDataUrl(img, img.width, img.height, capturedLocation));
         closeCamera();
       };
@@ -232,7 +270,7 @@ export default function PhotoCapture({ value, onChange, onLocationChange, label,
           <img src={value} alt={t('photoCapture.capturedEvidenceAlt')} />
           <div className="photo-preview-actions">
             <button type="button" className="ghost-btn" onClick={openCamera}>↻ {t('photoCapture.retake')}</button>
-            <button type="button" className="ghost-btn danger-ghost" onClick={() => { onChange(''); setGeo(null); geoRef.current = null; setGeoStatus('idle'); onLocationChange?.(null); }}>✕ {t('photoCapture.remove')}</button>
+            <button type="button" className="ghost-btn danger-ghost" onClick={() => { ++locationRequest.current; ++fileRequest.current; onBusyChange?.(false); setConfirmed(false); onChange(''); setGeo(null); geoRef.current = null; setGeoStatus('idle'); onLocationChange?.(null); }}>✕ {t('photoCapture.remove')}</button>
           </div>
         </div>
       ) : (
@@ -255,25 +293,33 @@ export default function PhotoCapture({ value, onChange, onLocationChange, label,
             <div>
               <GoogleMapPreview lat={geo.lat} lng={geo.lng} alt={geo.address || coordLabel(geo.lat, geo.lng)} />
               <div className="geo-address-line">📍 {geo.address || coordLabel(geo.lat, geo.lng)}</div>
-              <span>{t('photoCapture.geoSummary', { coord: coordLabel(geo.lat, geo.lng), accuracy: Math.round(geo.accuracy) })}</span>
-              {geo.muni?.municipalBody && geo.muni?.confidence !== 'district' && (
-                <div className="muni-line">🏛 {t('photoCapture.notify')} <strong>{geo.muni.municipalBody}</strong></div>
-              )}
-              {geo.muni?.municipalBody && geo.muni?.confidence === 'district' && (
-                <div className="muni-line muni-warn">🏛 {t('photoCapture.notify')} <strong>{geo.muni.municipalBody}</strong> {t('photoCapture.districtLevelNote')}</div>
-              )}
-              {!geo.muni?.municipalBody && geo.muni?.options && (
-                <div className="muni-line muni-warn">🏛 {t('photoCapture.multipleBodies', { district: geo.muni.district, options: geo.muni.options.join(', ') })}</div>
-              )}
-              {!geo.muni?.municipalBody && !geo.muni?.options && geo.muni?.confidence === 'out-of-state' && (
-                <div className="muni-line muni-warn">🏛 {t('photoCapture.outsideState')}</div>
-              )}
-              {!geo.muni?.municipalBody && !geo.muni?.options && geo.muni?.confidence === 'none' && (
-                <div className="muni-line muni-warn">🏛 {t('photoCapture.notIdentified')}</div>
-              )}
+              <span>{geo.source === 'manual' ? t('photoCapture.manualLocation') : t('photoCapture.geoSummary', { coord: coordLabel(geo.lat, geo.lng), accuracy: Math.round(geo.accuracy) })}</span>
+              <div className="muni-line">🏛 {geo.muni?.municipalBody
+                ? <>{t('photoCapture.routedTo')} <strong>{geo.muni.municipalBody}</strong></>
+                : t('photoCapture.reviewRouting')}</div>
+              <p>{t('photoCapture.checkPin')}</p>
+              <label className="location-confirm-check">
+                <input type="checkbox" checked={confirmed} onChange={e => { setConfirmed(e.target.checked); onLocationChange?.(locationPayload(geo, e.target.checked)); }} />
+                {t('photoCapture.confirmPin')}
+              </label>
+              <button type="button" className="ghost-btn" onClick={locate}>{t('photoCapture.refreshLocation')}</button>
+
             </div>
           )}
           {geoStatus === 'error' && <>⚠ {t('photoCapture.locationErrorPrefix')} <button type="button" className="text-btn" onClick={locate}>{t('photoCapture.tryAgain')}</button></>}
+        </div>
+      )}
+
+      {value && allowCorrection && (
+        <div className="location-correction">
+          <button type="button" className="text-btn" onClick={() => setManual(v => !v)}>{t('photoCapture.correctLocation')}</button>
+          {manual && <div className="coordinate-editor">
+            <p>{t('photoCapture.coordinateHelp')}</p>
+            <label>{t('photoCapture.latitude')}<input inputMode="decimal" value={coordinates.lat} onChange={e => setCoordinates({ ...coordinates, lat: e.target.value })} /></label>
+            <label>{t('photoCapture.longitude')}<input inputMode="decimal" value={coordinates.lng} onChange={e => setCoordinates({ ...coordinates, lng: e.target.value })} /></label>
+            {coordinateError && <p role="alert">{t('photoCapture.invalidCoordinates')}</p>}
+            <button type="button" className="ghost-btn" onClick={applyCoordinates}>{t('photoCapture.applyLocation')}</button>
+          </div>}
         </div>
       )}
 
@@ -302,7 +348,7 @@ export default function PhotoCapture({ value, onChange, onLocationChange, label,
             {!camError && (
               <div className="camera-controls">
                 <button type="button" className="camera-flip" onClick={flipCamera} title={t('photoCapture.switchCamera')}>⟳</button>
-                <button type="button" className="shutter-btn" onClick={capture} disabled={starting} aria-label={t('photoCapture.capturePhotoAria')} />
+                <button type="button" className="shutter-btn" onClick={capture} disabled={starting || geoStatus === 'locating'} aria-label={t('photoCapture.capturePhotoAria')} />
                 <span className="camera-flip-spacer" />
               </div>
             )}
