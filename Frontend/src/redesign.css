@@ -1,0 +1,1730 @@
+/* Samadhan — a warm, illustrated Kolkata. Functional base styles live in styles.css. */
+@import url("https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap");
+:root {
+  --ink: #2c2923;
+  --muted: #756c5e;
+  --line: #e7d9c4;
+  --paper: #fffcf5;
+  --bg: #faf0dd;
+  --primary: #c23c17;
+  --primary-dark: #9b2a0e;
+  --primary-light: #fbe7d4;
+  --accent: #e99435;
+  --shadow: 0 16px 44px #69441d12;
+  --radius: 22px;
+  --serif: "Lora", "Noto Sans Bengali", Georgia, serif;
+}
+html {
+  scroll-padding-top: 120px;
+}
+html,
+body {
+  overflow-x: clip;
+}
+body {
+  background: var(--bg);
+  line-height: 1.6;
+}
+button,
+a,
+input,
+select,
+textarea {
+  touch-action: manipulation;
+}
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+a {
+  color: var(--primary-dark);
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid #227a80;
+  outline-offset: 4px;
+}
+h1,
+h2,
+h3 {
+  font-family: var(--serif) !important;
+  letter-spacing: -0.035em !important;
+  line-height: 1.15;
+}
+h1 em {
+  font-style: normal;
+  color: var(--primary);
+}
+.eyebrow,
+.form-step {
+  color: var(--primary);
+  font-size: 11px;
+  letter-spacing: 0.21em;
+  font-weight: 800;
+  opacity: 1;
+}
+.brand {
+  font-family: var(--serif);
+  gap: 12px;
+  flex-shrink: 0;
+}
+.brand-symbol {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  line-height: 1;
+  color: #fff;
+  font:
+    38px "Noto Sans Bengali",
+    sans-serif;
+  background: linear-gradient(140deg, #ff971d, #ed5913);
+  border-radius: 15px;
+  box-shadow: 0 6px 20px #da692020;
+}
+.brand-wordmark {
+  font-family: var(--serif);
+  font-size: 25px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -1px;
+}
+.brand-wordmark small {
+  display: block;
+  color: var(--primary);
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 17px;
+  letter-spacing: 0;
+  margin: 4px 0 0 4px;
+}
+.admin-shell .brand-wordmark small,
+.admin-auth .brand-wordmark small {
+  font:
+    10px "DM Sans",
+    sans-serif;
+  letter-spacing: 0.18em;
+  font-style: normal;
+}
+.shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  isolation: isolate;
+  background:
+    linear-gradient(#fff9eeaa, #fff5e5eb 600px),
+    url("./assets/kolkata-waterfront.webp") center bottom / 100% auto no-repeat;
+}
+.shell .page {
+  flex: 1;
+}
+.container {
+  width: min(1280px, calc(100% - 80px));
+}
+.page {
+  padding: 32px 0 90px;
+}
+.app-nav {
+  height: auto;
+  min-height: 90px;
+  background: #fffcf3ee;
+  border-bottom: 1px solid #e7d9c4;
+  box-shadow: 0 4px 22px #76501d06;
+  backdrop-filter: blur(14px);
+}
+.nav-inner {
+  width: min(1360px, calc(100% - 64px));
+  gap: 32px;
+  padding: 15px 0;
+  flex-wrap: wrap;
+}
+.nav-links {
+  gap: 8px;
+  display: flex;
+}
+.nav-links a {
+  min-height: 44px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 10px 18px;
+  border-radius: 13px;
+  color: #695847;
+  font-size: 13px;
+}
+.nav-links a.active {
+  background: var(--primary);
+  box-shadow: 0 4px 12px #a4391420;
+}
+.nav-links a span {
+  font-size: 21px;
+  line-height: 1;
+}
+.nav-user {
+  gap: 12px;
+}
+.nav-user .lang-toggle {
+  position: static;
+}
+.lang-toggle {
+  border-color: #edcdb0;
+  background: #fff8ec;
+  padding: 3px;
+}
+.lang-toggle button {
+  min-width: 44px;
+  min-height: 38px;
+  padding: 5px 13px;
+  font-size: 12px;
+  color: #8c4b26;
+}
+.lang-toggle button.active {
+  background: var(--primary);
+}
+.avatar {
+  background: #ecd8bb;
+  color: #724424;
+  width: 36px;
+  height: 36px;
+}
+.user-name {
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ghost-btn,
+.primary-btn,
+.button {
+  min-height: 46px;
+  padding: 11px 20px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.4;
+  box-shadow: none;
+}
+.primary-btn,
+.button {
+  background: linear-gradient(115deg, #c63c13, #e4531c);
+  box-shadow: 0 8px 20px #c342151c;
+}
+.primary-btn:hover,
+.button:hover {
+  background: #b53312;
+  box-shadow: 0 8px 20px #c3421530;
+}
+.ghost-btn {
+  background: #fffcf4;
+  color: #6b4933;
+  border: 1px solid #dfc9af;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.signout {
+  font-size: 12px;
+  padding: 9px 13px;
+  min-height: 40px;
+}
+.panel {
+  border-color: var(--line);
+  background: #fffcf5f5;
+  box-shadow: var(--shadow);
+}
+/* Auth pages: live, accessible forms over an illustrated landscape. */
+.auth-page {
+  padding: 32px clamp(20px, 4vw, 72px);
+  gap: clamp(24px, 5vw, 90px);
+  grid-template-columns: 1.05fr 1fr;
+  align-items: stretch;
+  min-height: 100dvh;
+  background: #fff2db url("./assets/kolkata-waterfront.webp") center
+    bottom/cover no-repeat;
+  position: relative;
+  isolation: isolate;
+}
+.auth-page:before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #fff3dfa8, #fff4e44d 52%, #fff3de88);
+  z-index: -1;
+}
+.auth-visual {
+  padding: 12px 0 0 32px;
+  color: var(--ink);
+  background: none;
+  min-height: 760px;
+  overflow: visible;
+}
+.auth-visual:before,
+.auth-visual:after {
+  display: none;
+}
+.auth-copy {
+  margin: 80px 0 340px;
+  max-width: 570px;
+}
+.auth-copy h1 {
+  font-size: clamp(40px, 4.5vw, 70px);
+  line-height: 1.07;
+  letter-spacing: -0.05em;
+  margin: 20px 0 24px;
+}
+.auth-copy p {
+  color: #675f50;
+  font-size: 17px;
+  line-height: 1.8;
+  max-width: 430px;
+}
+.city-signature {
+  display: inline-block;
+  font-family: var(--serif);
+  font-size: 30px;
+  font-style: italic;
+  color: var(--primary);
+  border-bottom: 3px solid #df642a;
+  margin-top: 10px;
+  transform: rotate(-3deg);
+}
+.city-signature span {
+  font: 18px sans-serif;
+}
+.auth-form-side {
+  padding: 85px 36px 60px;
+  background: #fffcf4f5;
+  border: 1px solid #fffdf2;
+  border-radius: 28px;
+  box-shadow: 0 14px 60px #72502112;
+  margin: 45px 0 12px;
+  align-items: center;
+  overflow: hidden;
+}
+.auth-form-side:after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 110px;
+  background:
+    linear-gradient(#fffcf5cc, #fffcf5aa),
+    url("./assets/kolkata-waterfront.webp") center 75% / cover;
+  pointer-events: none;
+  z-index: 0;
+}
+.auth-card {
+  background: transparent;
+  padding: 0;
+  box-shadow: none;
+  max-width: 460px;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+.auth-card .brand {
+  margin-bottom: 44px;
+}
+.auth-card h2 {
+  font-size: clamp(30px, 3.1vw, 47px);
+  margin: 12px 0 16px;
+}
+.auth-card h2:after {
+  content: "";
+  display: block;
+  width: 66px;
+  height: 3px;
+  background: var(--primary);
+  border-radius: 50%;
+  margin: 16px 0 24px;
+  transform: rotate(-2deg);
+}
+.subtitle {
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.8;
+  margin-bottom: 28px;
+}
+.auth-card .primary-btn {
+  min-height: 54px;
+  margin-top: 5px;
+}
+.field {
+  gap: 8px;
+  margin-bottom: 22px;
+}
+.field label,
+.otp-wrap label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #44372d;
+}
+.field input,
+.field select,
+.field textarea,
+.grievance-form-card input,
+.grievance-form-card select,
+.grievance-form-card textarea {
+  border: 1px solid #dfd4c3;
+  background: #fffdf8;
+  border-radius: 12px;
+  padding: 14px 16px;
+  min-height: 52px;
+  font-size: 16px;
+  color: var(--ink);
+  box-shadow: 0 2px 3px #64431e03;
+}
+.field input::placeholder,
+.field textarea::placeholder {
+  color: #93877a;
+}
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px #c23c1712;
+}
+.link-row {
+  border-top: 1px solid var(--line);
+  padding-top: 24px;
+  margin-top: 30px;
+  font-size: 13px;
+  line-height: 1.9;
+}
+.link-row a {
+  display: inline-block;
+  padding: 4px 0;
+  color: var(--primary);
+}
+.step-label {
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 11px;
+  margin: 0 0 24px;
+}
+.step-label i {
+  width: 20px;
+}
+.step-dot {
+  width: 26px;
+  height: 26px;
+  flex: none;
+}
+.step-dot.active,
+.step-dot.done {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.otp-input {
+  font-family: "DM Sans", sans-serif;
+  font-size: 28px;
+  min-height: 62px;
+  background: #fffaf0;
+  letter-spacing: 10px;
+}
+.back-btn,
+.text-btn {
+  min-height: 44px;
+}
+.message {
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+.security-note {
+  color: var(--ink);
+}
+/* Dashboards */
+.hero-row,
+.admin-banner {
+  position: relative;
+  isolation: isolate;
+  min-height: 238px;
+  margin: 0 0 26px;
+  padding: 36px 0;
+  align-items: flex-end;
+  border-radius: 0;
+  background: none;
+  overflow: hidden;
+}
+.hero-row:before,
+.admin-banner:before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -22% -3% -8% 35%;
+  background:
+    linear-gradient(90deg, #fbf2e5, #fbf2e500 70%),
+    url("./assets/kolkata-waterfront.webp") center 65% / cover no-repeat;
+  opacity: 0.8;
+  mask-image: linear-gradient(#0000, #000 18%, #000 82%, #0000);
+}
+.hero-row > div:first-child,
+.admin-banner > div:first-child {
+  max-width: 620px;
+}
+.hero-row h1,
+.admin-banner h1 {
+  font-size: clamp(34px, 3.8vw, 54px);
+  margin: 12px 0 15px;
+  color: var(--ink);
+}
+.hero-row p,
+.admin-banner p {
+  color: #6c6252;
+  max-width: 550px;
+  font-size: 15px;
+  line-height: 1.7;
+}
+.hero-row .actions {
+  flex: none;
+  position: relative;
+}
+.admin-banner:after {
+  display: none;
+}
+.admin-pill {
+  border-radius: 99px;
+  background: #234d42;
+  color: white;
+  border: 1px solid #3c6a5b;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.stat-grid {
+  gap: 20px;
+  margin-bottom: 25px;
+}
+.stat {
+  position: relative;
+  overflow: hidden;
+  min-height: 145px;
+  padding: 24px 28px;
+  isolation: isolate;
+}
+.stat:after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: 55%;
+  height: 100%;
+  right: -5%;
+  bottom: 0;
+  background:
+    linear-gradient(90deg, #fffcf5, transparent),
+    url("./assets/kolkata-waterfront.webp") 0 90% / auto 260px no-repeat;
+  opacity: 0.65;
+  mask-image: linear-gradient(90deg, transparent, #000);
+}
+.stat:nth-child(2):after {
+  background-position: 65% 65%;
+  filter: sepia(0.3) hue-rotate(150deg);
+}
+.stat:nth-child(3):after {
+  background-position: 100% 65%;
+}
+.stat-top {
+  color: #5c5040;
+  font-size: 13px;
+  justify-content: flex-start;
+  gap: 10px;
+  align-items: center;
+}
+.stat-icon {
+  order: -1;
+  background: #fde4b0;
+  color: #9b5e16;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 17px;
+}
+.stat:nth-child(2) .stat-icon {
+  background: #d6e7ed;
+  color: #265b72;
+}
+.stat:nth-child(3) .stat-icon {
+  background: #dcebd6;
+  color: #35683b;
+}
+.stat-number {
+  font-family: var(--serif);
+  font-size: 40px;
+  line-height: 1.1;
+  margin-top: 12px;
+}
+.panel-head {
+  padding: 24px 28px;
+  gap: 18px;
+}
+.panel-head h3 {
+  font-size: 23px;
+  margin-bottom: 5px;
+}
+.panel-head span {
+  font-size: 12px;
+}
+.panel-head > div:last-child {
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.empty {
+  padding: 32px 24px 45px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+.empty-icon {
+  font-size: 0;
+  width: min(340px, 100%);
+  height: 160px;
+  margin-bottom: 20px;
+  background: url("./assets/kolkata-waterfront.webp") center 77% / cover;
+  border-radius: 50%;
+  mask-image: radial-gradient(ellipse, #000 40%, transparent 72%);
+}
+.empty strong {
+  font: 600 26px var(--serif);
+  color: var(--ink);
+}
+.empty p {
+  font-size: 14px;
+  margin: 10px 0 24px;
+}
+.empty .button {
+  min-width: 200px;
+}
+.table-wrap {
+  overscroll-behavior: contain;
+}
+table {
+  background: transparent;
+}
+th,
+td {
+  padding: 18px 16px;
+  border-color: var(--line);
+  white-space: normal;
+  font-size: 13px;
+}
+th {
+  color: #857461;
+  background: #f7efdf;
+  letter-spacing: 0.1em;
+  font-size: 10px;
+}
+td {
+  max-width: 260px;
+  overflow-wrap: anywhere;
+}
+.title-cell {
+  min-width: 160px;
+}
+.title-cell a {
+  text-decoration: none;
+  color: var(--ink);
+  font-weight: 700;
+}
+.title-cell a:hover {
+  color: var(--primary);
+  text-decoration: underline;
+}
+.select-status {
+  font-size: 14px;
+  min-height: 44px;
+  max-width: 100%;
+  background: #fffdf7;
+  border-color: #dfcdb6;
+}
+.status {
+  padding: 6px 10px;
+  white-space: nowrap;
+}
+.thumb-btn {
+  width: 68px;
+  height: 58px;
+  border-radius: 10px;
+}
+.thumb-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.loading-state {
+  padding: 60px 25px;
+  text-align: center;
+  color: var(--muted);
+}
+.loading-state:before {
+  content: "";
+  display: block;
+  width: 28px;
+  height: 28px;
+  border: 3px solid var(--line);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 16px;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+/* Report form and detail */
+.grievance-shell {
+  width: 100%;
+  grid-template-columns: minmax(240px, 0.7fr) minmax(0, 1.4fr);
+  gap: 34px;
+  max-width: none;
+  padding: 12px 0;
+}
+.grievance-intro {
+  color: var(--ink);
+  background: none;
+  border: none;
+  box-shadow: none;
+  padding: 28px 8px 280px 0;
+  position: relative;
+}
+.grievance-intro h1 {
+  font-family: var(--serif);
+  font-size: clamp(36px, 3.7vw, 52px);
+  line-height: 1.15;
+}
+.grievance-intro h1 span {
+  color: var(--primary);
+}
+.grievance-intro-text {
+  color: var(--muted);
+  line-height: 1.8;
+}
+.grievance-features {
+  gap: 22px;
+  margin-top: 30px;
+}
+.feature-icon {
+  background: #f8dfb4;
+  box-shadow: none;
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  font-size: 21px;
+}
+.grievance-feature:nth-child(2) .feature-icon {
+  background: #d4e6ec;
+}
+.grievance-feature:nth-child(3) .feature-icon {
+  background: #dce9d3;
+}
+.grievance-feature strong {
+  font-family: var(--serif);
+  font-size: 17px;
+}
+.grievance-feature span {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.grievance-intro .victoria-memorial,
+.grievance-city-art {
+  display: none;
+}
+.grievance-intro:after {
+  content: "";
+  position: absolute;
+  height: 260px;
+  left: -24px;
+  right: -24px;
+  bottom: 0;
+  background: url("./assets/kolkata-waterfront.webp") center 85% / cover;
+  mask-image: linear-gradient(transparent, #000 28%, #000 75%, transparent);
+}
+.grievance-form-card {
+  min-width: 0;
+  background: #fffcf5f5;
+  padding: 32px;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+.grievance-form-header h2 {
+  font-size: 32px;
+  line-height: 1.2;
+}
+.grievance-form-header p {
+  font-size: 14px;
+  color: var(--muted);
+}
+.report-number {
+  background: #f9ebd7;
+  min-width: 100px;
+  padding: 12px;
+}
+.report-number strong {
+  font-size: 16px;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+.report-number small {
+  font-size: 10px;
+}
+.grievance-form-card .field label {
+  font-size: 13px;
+}
+.grievance-form-card .form-grid {
+  gap: 0 18px;
+}
+.field textarea {
+  min-height: 160px;
+}
+.photo-dropzone {
+  background: #fff3df;
+  border: 1.5px dashed #db9b61;
+  padding: 30px 18px;
+  border-radius: 16px;
+  gap: 8px;
+}
+.photo-dropzone strong {
+  font: 600 21px var(--serif);
+}
+.photo-dropzone p {
+  font-size: 13px;
+  max-width: 360px;
+  line-height: 1.7;
+}
+.photo-dropzone-icon {
+  font-size: 30px;
+}
+.photo-dropzone:hover {
+  background: #ffefd4;
+}
+.photo-preview {
+  max-width: 100%;
+  width: 100%;
+}
+.photo-preview img {
+  max-height: 320px;
+  object-fit: contain;
+  background: #f4ead9;
+}
+.grievance-form-footer {
+  margin-top: 25px;
+  border-top: 1px solid var(--line);
+  padding-top: 22px;
+  gap: 12px;
+}
+.form-panel {
+  max-width: 960px;
+  background: #fffcf5;
+  padding: 36px;
+}
+.grievance-detail-head {
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.grievance-detail-description {
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.before-after-card {
+  background: #f8efdf;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.before-after-card .thumb-btn {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4/3;
+}
+.before-after-card .thumb-btn img {
+  object-fit: contain;
+}
+.grievance-detail-meta {
+  flex-wrap: wrap;
+}
+.grievance-detail-panel h2 {
+  margin-top: 12px;
+}
+.map-link,
+.muni-chip {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.camera-modal {
+  padding: 20px;
+  z-index: 11000;
+  background: #252018bb;
+  backdrop-filter: blur(6px);
+  overflow-y: auto;
+}
+.camera-modal-inner,
+.resolve-modal-card {
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-radius: 22px;
+}
+.resolve-modal-card {
+  background: var(--paper);
+  padding: 30px;
+  position: relative;
+}
+.camera-close,
+.ai-close,
+.spam-hint-close {
+  min-width: 44px;
+  min-height: 44px;
+}
+.resolve-modal-card h3 {
+  padding-right: 38px;
+}
+.camera-stage {
+  min-height: 200px;
+}
+.camera-video {
+  max-height: 65dvh;
+  object-fit: contain;
+}
+.lightbox-inner {
+  position: relative;
+}
+.lightbox-inner > img {
+  max-height: 80dvh;
+  object-fit: contain;
+}
+.resolve-modal-footer {
+  flex-wrap: wrap;
+}
+.geo-badge {
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.google-map-preview {
+  max-width: 100%;
+}
+/* Help panels: independent of page width, keyboard and safe-area aware. */
+.ai-assistant,
+.instructions-guide {
+  bottom: max(18px, env(safe-area-inset-bottom));
+  gap: 10px;
+}
+.ai-assistant {
+  right: 20px;
+}
+.instructions-guide {
+  left: 20px;
+}
+.ai-fab,
+.instructions-fab {
+  width: 50px;
+  height: 50px;
+  box-shadow: 0 8px 24px #5e3a2925;
+  background: var(--primary);
+  border: 3px solid #fff8ec;
+}
+.instructions-fab {
+  background: #285a49;
+}
+.ai-panel,
+.instructions-panel {
+  background: var(--paper);
+  border-radius: 22px;
+  border: 1px solid #dfc9af;
+  max-height: calc(100dvh - 110px);
+}
+.ai-panel-head,
+.instructions-panel-head {
+  background: #fff5e4;
+  padding: 16px;
+  gap: 10px;
+}
+.ai-panel-title,
+.instructions-panel-title {
+  min-width: 0;
+}
+.ai-body,
+.instructions-body {
+  background: #fffcf5;
+  overscroll-behavior: contain;
+}
+.ai-input-row {
+  background: #fff8ed;
+  padding: 12px;
+}
+.ai-input-row input {
+  min-width: 0;
+  font-size: 16px;
+}
+.ai-bubble {
+  overflow-wrap: anywhere;
+}
+.ai-close {
+  flex: none;
+}
+.instructions-steps {
+  counter-reset: guide;
+  gap: 0;
+}
+.instructions-step {
+  counter-increment: guide;
+  position: relative;
+  padding: 18px 0 18px 42px;
+  border-bottom: 1px solid var(--line);
+}
+.instructions-step:before {
+  content: counter(guide);
+  position: absolute;
+  left: 0;
+  top: 18px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--primary);
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+}
+.instructions-step:nth-child(2):before {
+  background: #c38a1f;
+}
+.instructions-step:nth-child(3):before {
+  background: #2e725c;
+}
+.instructions-step:nth-child(4):before {
+  background: #3a718a;
+}
+.instructions-step-heading {
+  font-family: var(--serif);
+  font-size: 15px;
+  color: var(--ink);
+}
+.instructions-footer {
+  text-align: center;
+  font: italic 18px var(--serif);
+  color: var(--primary);
+}
+.ai-panel-title strong,
+.instructions-panel-title strong {
+  font-family: var(--serif);
+  font-size: 16px;
+}
+.ai-avatar,
+.instructions-avatar {
+  background: #f3d5ad;
+  color: #853715;
+  flex: none;
+}
+.ai-input-row .primary-btn {
+  padding: 10px 14px;
+}
+.spam-hint-popup {
+  background: var(--paper);
+  padding: 28px;
+}
+.spam-hint-popup h3 {
+  padding-right: 28px;
+}
+.shell > footer {
+  background: #fff6e7c9;
+  color: #72553b !important;
+  border-color: var(--line) !important;
+  padding: 20px 80px 28px !important;
+}
+.photo-capture > label {
+  display: block;
+  margin-bottom: 8px;
+}
+.status.rejected {
+  background: #f9e3dd;
+  color: #9b3827;
+}
+@media (min-width: 1500px) {
+  .auth-copy {
+    margin-top: 120px;
+  }
+  .auth-page {
+    padding-left: 8vw;
+    padding-right: 6vw;
+  }
+  .auth-visual {
+    min-height: 850px;
+  }
+}
+@media (max-width: 1100px) {
+  .nav-inner {
+    gap: 18px;
+    width: calc(100% - 40px);
+  }
+  .nav-user .user-name,
+  .nav-user .avatar {
+    display: none;
+  }
+  .nav-links a {
+    padding: 10px 12px;
+  }
+  .container {
+    width: calc(100% - 48px);
+  }
+  .hero-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .hero-row:before {
+    left: 30%;
+    opacity: 0.65;
+  }
+  .hero-row .actions {
+    align-self: flex-end;
+  }
+  .auth-page {
+    gap: 28px;
+    padding: 24px;
+  }
+  .auth-visual {
+    padding-left: 0;
+  }
+  .auth-copy {
+    margin-top: 70px;
+  }
+  .auth-form-side {
+    padding: 85px 28px 50px;
+  }
+  .grievance-shell {
+    gap: 22px;
+    grid-template-columns: 1fr 1.65fr;
+  }
+  .grievance-form-card {
+    padding: 25px;
+  }
+  .grievance-form-header {
+    flex-wrap: wrap;
+  }
+  .report-number {
+    display: none;
+  }
+  .stat {
+    padding: 20px;
+  }
+  .brand-wordmark {
+    font-size: 23px;
+  }
+}
+@media (max-width: 850px) {
+  .app-nav {
+    position: sticky;
+    min-height: 0;
+  }
+  .nav-inner {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    padding: 12px 0 0;
+    gap: 12px;
+    width: calc(100% - 32px);
+  }
+  .nav-inner > .brand {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .nav-user {
+    grid-column: 2;
+    grid-row: 1;
+    margin-left: 0;
+    gap: 8px;
+  }
+  .nav-links {
+    grid-column: 1/-1;
+    grid-row: 2;
+    display: flex !important;
+    gap: 8px;
+    border-top: 1px solid var(--line);
+    padding: 8px 0;
+  }
+  .nav-links a {
+    flex: 1;
+    justify-content: center;
+    border-radius: 10px;
+    font-size: 13px;
+  }
+  .brand-wordmark {
+    font-size: 22px;
+  }
+  .brand-wordmark small {
+    font-size: 13px;
+  }
+  .brand-symbol {
+    width: 39px;
+    height: 39px;
+    font-size: 31px;
+    border-radius: 11px;
+  }
+  .signout {
+    display: inline-flex !important;
+    min-height: 44px;
+    padding: 8px;
+    font-size: 11px;
+  }
+  .nav-user .lang-toggle {
+    padding: 2px;
+  }
+  .lang-toggle button {
+    padding: 4px 8px;
+    min-width: 38px;
+    min-height: 38px;
+  }
+  .container {
+    width: calc(100% - 32px);
+  }
+  .page {
+    padding: 18px 0 90px;
+  }
+  .hero-row,
+  .admin-banner {
+    padding: 24px 0;
+    min-height: 220px;
+  }
+  .hero-row:before,
+  .admin-banner:before {
+    left: 20%;
+    opacity: 0.5;
+  }
+  .hero-row h1,
+  .admin-banner h1 {
+    font-size: 38px;
+  }
+  .hero-row .actions {
+    width: auto;
+    display: flex;
+    align-self: flex-start;
+  }
+  .hero-row .actions > * {
+    width: auto;
+  }
+  .stat-grid {
+    gap: 12px;
+  }
+  .stat {
+    min-height: 128px;
+    padding: 17px;
+  }
+  .stat-top {
+    font-size: 12px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .stat-icon {
+    display: grid;
+  }
+  .stat-number {
+    font-size: 32px;
+    margin-top: 8px;
+  }
+  .stat:after {
+    width: 65%;
+    opacity: 0.35;
+  }
+  .table-panel {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+  }
+  .panel-head {
+    padding: 20px;
+    flex-wrap: wrap;
+  }
+  .panel-head h3 {
+    font-size: 22px;
+  }
+  .panel-head > div:last-child {
+    width: auto;
+    max-width: 100%;
+  }
+  .table-wrap {
+    padding: 12px;
+    overflow: visible;
+  }
+  table,
+  tbody {
+    display: block;
+    width: 100%;
+  }
+  thead {
+    display: none;
+  }
+  tbody tr {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    background: #fffdf8;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+    margin: 0 0 12px;
+    padding: 12px;
+  }
+  tbody tr:last-child {
+    margin-bottom: 0;
+  }
+  td {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 7px;
+    min-width: 0;
+    max-width: none;
+    width: auto;
+    border: 0 !important;
+    padding: 10px;
+    font-size: 13px;
+    white-space: normal;
+    text-align: left;
+  }
+  td:before {
+    content: attr(data-label);
+    position: static;
+    display: block;
+    min-width: 0;
+    max-width: none;
+    width: auto;
+    margin: 0;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #978169;
+    font-weight: 600;
+  }
+  td.title-cell {
+    grid-column: 1/-1;
+    min-width: 0;
+    font-size: 17px;
+    order: -1;
+  }
+  .select-status {
+    width: 100%;
+    font-size: 16px;
+  }
+  .empty {
+    padding: 25px 16px 35px;
+  }
+  .empty strong {
+    font-size: 23px;
+  }
+  .empty-icon {
+    height: 145px;
+  }
+  .grievance-shell {
+    display: block;
+    padding: 0;
+  }
+  .grievance-intro {
+    min-height: 0;
+    padding: 20px 0 28px;
+    background: none;
+    border-radius: 0;
+  }
+  .grievance-intro h1 {
+    font-size: 37px;
+    max-width: 480px;
+    margin: 12px 0;
+  }
+  .grievance-intro h1 br {
+    display: none;
+  }
+  .grievance-intro-text {
+    max-width: 520px;
+    font-size: 14px;
+  }
+  .grievance-features {
+    display: none;
+  }
+  .grievance-intro:after {
+    height: 100%;
+    left: 40%;
+    right: 0;
+    z-index: -1;
+    opacity: 0.2;
+  }
+  .grievance-form-card {
+    padding: 25px;
+  }
+  .grievance-form-header {
+    margin-bottom: 23px;
+  }
+  .grievance-form-header h2 {
+    font-size: 30px;
+  }
+  .form-panel {
+    padding: 25px;
+  }
+  .admin-banner {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .admin-pill {
+    font-size: 11px;
+    padding: 8px 12px;
+  }
+  .auth-page {
+    grid-template-columns: 1fr;
+    padding: 24px 20px 40px;
+    background-size: auto 900px;
+    background-position: center top;
+    gap: 20px;
+  }
+  .auth-visual {
+    min-height: 0;
+    padding: 0;
+  }
+  .auth-visual > .brand {
+    max-width: 60%;
+  }
+  .auth-copy {
+    margin: 30px 0 5px;
+    max-width: 560px;
+  }
+  .auth-copy h1 {
+    font-size: 40px;
+    max-width: 500px;
+    margin: 12px 0;
+  }
+  .auth-copy p {
+    font-size: 14px;
+    max-width: 480px;
+    line-height: 1.7;
+  }
+  .city-signature {
+    display: none;
+  }
+  .auth-form-side {
+    margin: 0;
+    padding: 30px 24px 44px;
+    border-radius: 22px;
+    overflow: visible;
+  }
+  .auth-form-side:after {
+    border-radius: 0 0 22px 22px;
+    height: 75px;
+  }
+  .auth-form-side > .lang-toggle {
+    position: absolute;
+    top: auto;
+    bottom: calc(100% + 195px);
+    right: 0;
+  }
+  .auth-page > .auth-form-side > .lang-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    bottom: auto;
+    z-index: 25;
+    box-shadow: 0 3px 10px #7651220a;
+  }
+  .auth-card {
+    max-width: 520px;
+  }
+  .auth-card > .brand {
+    display: none;
+  }
+  .auth-card h2 {
+    font-size: 34px;
+    margin-top: 0;
+  }
+  .auth-card h2:after {
+    margin: 12px 0 20px;
+  }
+  .auth-card .subtitle {
+    margin-bottom: 24px;
+  }
+  .auth-card .link-row {
+    margin-bottom: 0;
+  }
+  .auth-copy .eyebrow {
+    font-size: 10px;
+  }
+  .shell {
+    background-size: auto 800px;
+  }
+  .before-after-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+}
+@media (max-width: 480px) {
+  .nav-inner {
+    width: calc(100% - 24px);
+    gap: 10px;
+  }
+  .brand {
+    gap: 7px;
+  }
+  .brand-wordmark {
+    font-size: 19px;
+  }
+  .brand-symbol {
+    width: 34px;
+    height: 36px;
+    font-size: 28px;
+  }
+  .brand-wordmark small {
+    font-size: 11px;
+  }
+  .nav-user {
+    gap: 4px;
+  }
+  .signout {
+    font-size: 10px;
+    padding: 7px;
+  }
+  .nav-user .lang-toggle button {
+    font-size: 10px;
+    min-width: 32px;
+    padding: 4px 6px;
+  }
+  .container {
+    width: calc(100% - 24px);
+  }
+  .hero-row h1,
+  .admin-banner h1 {
+    font-size: 34px;
+  }
+  .hero-row p {
+    font-size: 14px;
+  }
+  .hero-row .actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 8px;
+  }
+  .hero-row .actions > * {
+    padding: 11px 12px;
+    font-size: 13px;
+    min-width: 0;
+  }
+  .stat-grid {
+    gap: 8px;
+  }
+  .stat {
+    min-height: 126px;
+    padding: 14px 11px;
+    border-radius: 16px;
+  }
+  .stat-top {
+    font-size: 10px;
+    line-height: 1.5;
+  }
+  .stat-number {
+    font-size: 29px;
+  }
+  .stat-icon {
+    width: 25px;
+    height: 25px;
+    font-size: 14px;
+  }
+  .stat:after {
+    display: none;
+  }
+  .panel-head {
+    padding: 18px;
+    gap: 12px;
+  }
+  .panel-head h3 {
+    font-size: 21px;
+  }
+  .panel-head > div:last-child {
+    width: 100%;
+  }
+  .panel-head > div:last-child select {
+    min-width: 0 !important;
+    flex: 1;
+    width: 0;
+  }
+  .panel-head > div:last-child button {
+    padding: 10px 12px;
+  }
+  .panel-head > span {
+    display: none;
+  }
+  .table-wrap {
+    padding: 8px;
+  }
+  tbody tr {
+    padding: 7px;
+  }
+  td {
+    padding: 9px 7px;
+  }
+  .auth-page {
+    padding: 22px 12px 28px;
+    gap: 20px;
+  }
+  .auth-visual {
+    padding: 0 8px;
+  }
+  .auth-copy {
+    margin-top: 28px;
+  }
+  .auth-copy h1 {
+    font-size: 34px;
+    max-width: 320px;
+  }
+  .auth-copy p {
+    font-size: 13px;
+    margin-bottom: 0;
+  }
+  .auth-form-side {
+    padding: 28px 20px 35px;
+  }
+  .auth-form-side > .lang-toggle {
+    right: 15px !important;
+  }
+  .auth-card h2 {
+    font-size: 31px;
+  }
+  .subtitle {
+    font-size: 14px;
+  }
+  .step-label {
+    font-size: 10px;
+    gap: 6px;
+  }
+  .step-label i {
+    width: 14px;
+  }
+  .otp-meta {
+    font-size: 11px;
+    flex-wrap: wrap;
+  }
+  .grievance-form-card,
+  .form-panel {
+    padding: 22px 18px;
+    border-radius: 20px;
+  }
+  .grievance-form-card .form-grid,
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .grievance-form-header h2 {
+    font-size: 29px;
+  }
+  .grievance-intro h1 {
+    font-size: 33px;
+  }
+  .grievance-form-footer {
+    display: grid;
+    grid-template-columns: auto 1fr;
+  }
+  .grievance-form-footer button {
+    padding: 12px;
+    font-size: 13px;
+  }
+  .photo-dropzone {
+    padding: 26px 14px;
+  }
+  .photo-dropzone strong {
+    font-size: 20px;
+  }
+  .photo-dropzone-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  .photo-dropzone-actions > * {
+    width: 100%;
+  }
+  .before-after-grid {
+    grid-template-columns: 1fr;
+  }
+  .grievance-detail-head {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .ai-assistant {
+    right: 12px;
+  }
+  .instructions-guide {
+    left: 12px;
+  }
+  .ai-panel,
+  .instructions-panel {
+    position: fixed;
+    left: 10px;
+    right: 10px;
+    bottom: calc(78px + env(safe-area-inset-bottom));
+    width: auto;
+    max-height: calc(100dvh - 100px);
+    height: min(550px, calc(100dvh - 100px));
+  }
+  .ai-fab,
+  .instructions-fab {
+    width: 48px;
+    height: 48px;
+  }
+  .ai-panel-title strong,
+  .instructions-panel-title strong {
+    font-size: 14px;
+  }
+  .instructions-panel-title span,
+  .ai-panel-title span {
+    font-size: 10px;
+  }
+  .ai-body {
+    padding: 12px;
+  }
+  .camera-modal {
+    padding: 10px;
+  }
+  .camera-modal-inner,
+  .resolve-modal-card {
+    max-height: calc(100dvh - 20px);
+    width: 100%;
+    border-radius: 18px;
+  }
+  .resolve-modal-card {
+    padding: 22px 16px;
+  }
+  .resolve-modal-footer {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+  .camera-controls {
+    padding-bottom: max(18px, env(safe-area-inset-bottom));
+  }
+  .shell > footer {
+    font-size: 11px !important;
+    padding: 20px 70px 90px !important;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *:before,
+  *:after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Floating panel wrappers must not intercept taps outside their own controls. */
+.ai-assistant,.instructions-guide { pointer-events:none; }
+.ai-assistant>*,.instructions-guide>* { pointer-events:auto; }
+.auth-page>.lang-toggle { position:absolute; top:22px; right:28px; }
+.back-link { display:inline-flex; min-height:44px; align-items:center; margin-bottom:12px; text-decoration:none; }
+@media(max-width:850px) {
+ .auth-page>.lang-toggle { top:20px;right:20px; }
+ .auth-form-side { backdrop-filter:none; background:#fffcf5f5; }
+ .grievance-shell { width:100%; }
+ .new-grievance-page { padding-top:0; }
+}

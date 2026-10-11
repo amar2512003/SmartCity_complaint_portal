@@ -1,3 +1,4 @@
+import useDialog from '../hooks/useDialog';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PhotoCapture from './PhotoCapture';
@@ -16,6 +17,7 @@ export default function ResolveGrievanceModal({ grievanceId, onClose, onResolved
   const [loc, setLoc] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const dialogRef = useDialog(true, () => { if (!submitting) onClose(); });
 
   const submit = async () => {
     if (!photo || !loc) {
@@ -41,12 +43,13 @@ export default function ResolveGrievanceModal({ grievanceId, onClose, onResolved
   };
 
   return (
-    <div className="camera-modal" role="dialog" aria-modal="true">
+    <div ref={dialogRef} aria-label={t('resolveModal.heading')} className="camera-modal" role="dialog" aria-modal="true">
       <div className="resolve-modal-card">
         <button
           type="button"
           className="camera-close resolve-modal-close"
           onClick={onClose}
+          disabled={submitting}
           aria-label={t('resolveModal.close')}
         >
           ✕

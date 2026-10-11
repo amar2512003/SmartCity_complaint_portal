@@ -50,7 +50,8 @@
       "status": "Status",
       "resolutionPhoto": "After",
       "update": "Update"
-    }
+    },
+    "loading": "Loading reports…"
   },
   "grievanceManage": {
     "heading": "Grievance Management",

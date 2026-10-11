@@ -93,7 +93,8 @@
       "location": "Location",
       "routedTo": "Routed to",
       "status": "Status"
-    }
+    },
+    "loading": "Loading reports…"
   },
   "grievanceForm": {
     "eyebrow": "CIVIC REPORT",

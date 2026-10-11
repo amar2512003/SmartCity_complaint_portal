@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import useDialog from '../hooks/useDialog';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 // A small "how it works" guide, purely informational — it doesn't touch any
@@ -11,13 +12,23 @@ import { useTranslation } from 'react-i18next';
 export default function InstructionsGuide() {
   const { t } = useTranslation('citizen');
   const [open, setOpen] = useState(false);
+  const dialogRef = useDialog(open, () => setOpen(false));
+  useEffect(() => {
+    const closeOther = event => { if (event.detail !== 'guide') setOpen(false); };
+    window.addEventListener('samadhan:help', closeOther);
+    return () => window.removeEventListener('samadhan:help', closeOther);
+  }, []);
+  const toggle = () => {
+    if (!open) window.dispatchEvent(new CustomEvent('samadhan:help', { detail: 'guide' }));
+    setOpen(value => !value);
+  };
 
   const steps = t('instructions.steps', { returnObjects: true }) || [];
 
   return (
     <div className="instructions-guide">
       {open && (
-        <div className="instructions-panel panel" role="dialog" aria-modal="true">
+        <div ref={dialogRef} className="instructions-panel panel" role="dialog" aria-modal="true" aria-label={t('instructions.title')}>
           <div className="instructions-panel-head">
             <div className="instructions-panel-title">
               <span className="instructions-avatar" aria-hidden="true">?</span>
@@ -56,7 +67,7 @@ export default function InstructionsGuide() {
       <button
         type="button"
         className="instructions-fab"
-        onClick={() => setOpen((o) => !o)}
+        onClick={toggle} aria-expanded={open}
         aria-label={open ? t('instructions.closeFabAria') : t('instructions.openFabAria')}
       >
         {open ? '✕' : '?'}

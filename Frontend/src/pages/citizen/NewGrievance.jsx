@@ -129,7 +129,7 @@ export default function NewGrievance() {
 
           <h1>
             {t('grievanceForm.headingLine1')}
-            <br />
+            <br />{' '}
             {t('grievanceForm.headingLine2Prefix')}<span>{t('grievanceForm.headingHighlight')}</span>
           </h1>
 
@@ -235,12 +235,12 @@ export default function NewGrievance() {
               {/* ISSUE TITLE */}
               <div className="field">
 
-                <label>
+                <label htmlFor="issue-title">
                   {t('grievanceForm.fields.titleLabel')}
                   <span className="required">*</span>
                 </label>
 
-                <input
+                <input id="issue-title" minLength={3}
                   placeholder={t('grievanceForm.fields.titlePlaceholder')}
                   value={f.title}
                   onChange={(e) =>
@@ -258,12 +258,12 @@ export default function NewGrievance() {
               {/* CATEGORY */}
               <div className="field">
 
-                <label>
+                <label htmlFor="issue-category">
                   {t('grievanceForm.fields.categoryLabel')}
                   <span className="required">*</span>
                 </label>
 
-                <select
+                <select id="issue-category"
                   value={f.category}
                   onChange={(e) =>
                     setF({
@@ -286,7 +286,7 @@ export default function NewGrievance() {
               <div className="field full-field">
 
                 <div className="label-row">
-                  <label>
+                  <label htmlFor="issue-description">
                     {t('grievanceForm.fields.descriptionLabel')}
                     <span className="required">*</span>
                   </label>
@@ -296,7 +296,7 @@ export default function NewGrievance() {
                   </span>
                 </div>
 
-                <textarea
+                <textarea id="issue-description" aria-label={t('grievanceForm.fields.descriptionLabel')} minLength={5}
                   placeholder={t('grievanceForm.fields.descriptionPlaceholder')}
                   value={f.description}
                   onChange={(e) =>

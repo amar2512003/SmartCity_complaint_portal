@@ -4,9 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { sendCitizenLoginOtp, verifyCitizenLoginOtp } from '../../api/citizenAuth.api';
 import { useAuth } from '../../context/AuthContext';
 import Message from '../../components/Message';
-import BridgeSketch from '../../components/BridgeSketch';
-import LanguageToggle from '../../components/LanguageToggle';
-import brandMark from '../../assets/brand-mark.png';
+import AuthLayout from '../../components/AuthLayout';
 
 export default function CitizenLogin() {
   const { t } = useTranslation('citizen');
@@ -36,27 +34,13 @@ export default function CitizenLogin() {
   const minutes = Math.floor(seconds / 60), remaining = String(seconds % 60).padStart(2, '0');
 
   return (
-    <div className="auth-page">
-      <section className="auth-visual">
-        <Link className="brand" to="/citizen/login"><span className="brand-mark"><img src={brandMark} alt="" style={{ width: 22, height: 22, objectFit: 'contain' }} /></span><span>Samadhan.</span></Link>
-        <div className="auth-copy">
-          <span className="eyebrow">{t('brand.tagline')}</span>
-          <h1>{t('login.heading')}</h1>
-          <p>{t('login.intro')}</p>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 18, fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,.85)', position: 'relative', zIndex: 1 }}> {t('brand.city')}</span>
-        </div>
-        <BridgeSketch />
-      </section>
-      <section className="auth-form-side">
-        <LanguageToggle />
-        <div className="auth-card">
-          <Link className="brand" to="/citizen/login"><span className="brand-mark"><img src={brandMark} alt="" style={{ width: 22, height: 22, objectFit: 'contain' }} /></span><span>Samadhan.</span></Link>
+    <AuthLayout>
           {step === 'email' ? (
             <>
               <h2>{t('login.welcomeBack')}</h2>
               <p className="subtitle">{t('login.emailStepSubtitle')}</p>
               <form onSubmit={request}>
-                <div className="field"><label>{t('otp.emailLabel')}</label><input type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required /></div>
+                <div className="field"><label htmlFor="email">{t('otp.emailLabel')}</label><input id="email" autoComplete="email" autoCapitalize="none" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required /></div>
                 <button className="primary-btn full" type="submit" disabled={loading}>{loading ? t('otp.sendingCode') : <>{t('login.sendOtp')} <span>→</span></>}</button>
               </form>
             </>
@@ -66,7 +50,7 @@ export default function CitizenLogin() {
               <h2>{t('otp.checkInbox')}</h2>
               <p className="subtitle">{t('login.otpSubtitlePrefix')} <strong>{email}</strong>.</p>
               <form onSubmit={verify}>
-                <div className="otp-wrap"><label>{t('otp.verificationCodeLabel')}</label><input className="otp-input" inputMode="numeric" autoComplete="one-time-code" maxLength={6} pattern="[0-9]{6}" placeholder="000000" value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))} required /></div>
+                <div className="otp-wrap"><label htmlFor="otp">{t('otp.verificationCodeLabel')}</label><input id="otp" className="otp-input" inputMode="numeric" autoComplete="one-time-code" maxLength={6} pattern="[0-9]{6}" placeholder="000000" value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))} required /></div>
                 <div className="otp-meta">
                   <span>{seconds ? t('otp.codeExpiresIn', { time: `${minutes}:${remaining}` }) : t('otp.codeExpired')}</span>
                   <button type="button" className="text-btn" onClick={resend} disabled={loading || seconds > 540}>{t('otp.resendCode')}</button>
@@ -81,8 +65,6 @@ export default function CitizenLogin() {
             {t('login.newToSmartCity')} <Link to="/citizen/signup">{t('login.createAccount')}</Link><br />
             <span style={{ display: 'inline-block', marginTop: 10 }}>{t('login.staffMember')} <Link to="/admin/login">{t('login.adminSignIn')}</Link></span>
           </div>
-        </div>
-      </section>
-    </div>
+    </AuthLayout>
   );
 }

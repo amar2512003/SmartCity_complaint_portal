@@ -35,16 +35,16 @@ export default function LanguageToggle() {
       <button
         type="button"
         className={current === 'en' ? 'active' : ''}
-        onClick={() => setLang('en')}
+        aria-pressed={current === 'en'} onClick={() => setLang('en')}
       >
         EN
       </button>
       <button
         type="button"
         className={current === 'bn' ? 'active' : ''}
-        onClick={() => setLang('bn')}
+        aria-pressed={current === 'bn'} onClick={() => setLang('bn')}
       >
-        বাং
+        বাংলা
       </button>
     </div>
   );

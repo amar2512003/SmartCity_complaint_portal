@@ -1,12 +1,11 @@
+import useDialog from '../../hooks/useDialog';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { sendCitizenSignupOtp, verifyCitizenSignupOtp } from '../../api/citizenAuth.api';
 import { useAuth } from '../../context/AuthContext';
 import Message from '../../components/Message';
-import BridgeSketch from '../../components/BridgeSketch';
-import LanguageToggle from '../../components/LanguageToggle';
-import brandMark from '../../assets/brand-mark.png';
+import AuthLayout from '../../components/AuthLayout';
 
 export default function CitizenSignup() {
   const { t } = useTranslation(['citizen', 'common']);
@@ -18,6 +17,7 @@ export default function CitizenSignup() {
   const [msg, setMsg] = useState('');
   const [err, setErr] = useState(false);
   const [showSpamHint, setShowSpamHint] = useState(false);
+  const spamRef = useDialog(showSpamHint, () => setShowSpamHint(false));
   const { login } = useAuth();
 
   useEffect(() => {
@@ -62,10 +62,10 @@ export default function CitizenSignup() {
   const remaining = String(seconds % 60).padStart(2, '0');
 
   return (
-    <div className="auth-page">
+    <AuthLayout signup>
       {showSpamHint && (
         <div className="spam-hint-overlay" onClick={() => setShowSpamHint(false)}>
-          <div className="spam-hint-popup" onClick={(e) => e.stopPropagation()}>
+          <div ref={spamRef} role="dialog" aria-modal="true" aria-label={t('signup.spamHint.title')} className="spam-hint-popup" onClick={(e) => e.stopPropagation()}>
             <button
               className="spam-hint-close"
               type="button"
@@ -89,28 +89,13 @@ export default function CitizenSignup() {
         </div>
       )}
 
-      <section className="auth-visual">
-        <Link className="brand" to="/citizen/login"><span className="brand-mark"><img src={brandMark} alt="" style={{ width: 22, height: 22, objectFit: 'contain' }} /></span><span></span></Link>
-        <div className="auth-copy">
-          <span className="eyebrow">{t('signup.eyebrow')}</span>
-          <h1>{t('signup.heading')}</h1>
-          <p>{t('signup.intro')}</p>
-          <div className="security-note"><span>✓</span><div><strong>{t('signup.secureTitle')}</strong><small>{t('signup.secureSubtitle')}</small></div></div>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 16, fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,.85)', position: 'relative', zIndex: 1 }}> {t('brand.city')}</span>
-        </div>
-        <BridgeSketch />
-      </section>
-      <section className="auth-form-side">
-        <LanguageToggle />
-        <div className="auth-card">
-          <Link className="brand" to="/citizen/login"><span className="brand-mark"><img src={brandMark} alt="" style={{ width: 22, height: 22, objectFit: 'contain' }} /></span><span>Samadhan.</span></Link>
           {step === 'details' ? (
             <>
               <div className="step-label"><span className="step-dot active">1</span><span>{t('signup.stepAccountDetails')}</span><i /><span className="step-dot">2</span><span>{t('signup.stepVerifyEmail')}</span></div>
               <h2>{t('signup.createYourAccount')}</h2><p className="subtitle">{t('signup.detailsSubtitle')}</p>
               <form onSubmit={sendOtp}>
-                <div className="field"><label>{t('signup.fullNameLabel')}</label><input placeholder={t('signup.fullNamePlaceholder')} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required minLength={2} /></div>
-                <div className="field"><label>{t('otp.emailLabel')}</label><input type="email" placeholder="you@example.com" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required /></div>
+                <div className="field"><label htmlFor="name">{t('signup.fullNameLabel')}</label><input id="name" autoComplete="name" placeholder={t('signup.fullNamePlaceholder')} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required minLength={2} /></div>
+                <div className="field"><label htmlFor="email">{t('otp.emailLabel')}</label><input id="email" autoComplete="email" autoCapitalize="none" type="email" placeholder="you@example.com" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required /></div>
                 <button className="primary-btn full" type="submit" disabled={loading}>{loading ? t('otp.sendingCode') : <>{t('signup.verifyEmailCta')} <span>→</span></>}</button>
               </form>
             </>
@@ -119,7 +104,7 @@ export default function CitizenSignup() {
               <div className="step-label"><span className="step-dot done">✓</span><span>{t('signup.stepAccountDetails')}</span><i className="done-line" /><span className="step-dot active">2</span><span>{t('signup.stepVerifyEmail')}</span></div>
               <h2>{t('otp.checkInbox')}</h2><p className="subtitle">{t('signup.otpSubtitlePrefix')} <strong>{form.email}</strong>.</p>
               <form onSubmit={verifyOtp}>
-                <div className="otp-wrap"><label>{t('otp.verificationCodeLabel')}</label><input className="otp-input" inputMode="numeric" autoComplete="one-time-code" maxLength={6} pattern="[0-9]{6}" placeholder="000000" value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))} required /></div>
+                <div className="otp-wrap"><label htmlFor="otp">{t('otp.verificationCodeLabel')}</label><input id="otp" className="otp-input" inputMode="numeric" autoComplete="one-time-code" maxLength={6} pattern="[0-9]{6}" placeholder="000000" value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))} required /></div>
                 <div className="otp-meta">
                   <span>{seconds ? t('otp.codeExpiresIn', { time: `${minutes}:${remaining}` }) : t('otp.codeExpired')}</span>
                   <button type="button" className="text-btn" onClick={resend} disabled={loading || seconds > 540}>{t('otp.resendCode')}</button>
@@ -131,8 +116,6 @@ export default function CitizenSignup() {
           )}
           <Message text={msg} error={err} />
           <div className="link-row">{t('signup.alreadyHaveAccount')} <Link to="/citizen/login">{t('signup.signIn')}</Link></div>
-        </div>
-      </section>
-    </div>
+    </AuthLayout>
   );
 }

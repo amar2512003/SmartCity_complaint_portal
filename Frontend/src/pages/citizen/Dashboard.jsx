@@ -8,83 +8,28 @@ import MapLink from '../../components/MapLink';
 import MunicipalBadge from '../../components/MunicipalBadge';
 
 function AnimatedGreeting({ name }) {
-  const [text, setText] = useState('');
-
-  const firstName = name?.split(' ')[0] || 'there';
-
-  useEffect(() => {
-    const english = `Hello, ${firstName}.`;
-    const bengali = `নমস্কার, ${firstName}.`;
-
-    let index = 0;
-    let typeTimer;
-    let bengaliTimer;
-    let englishTimer;
-
-    // Type "Hello, Name."
-    typeTimer = setInterval(() => {
-      index += 1;
-      setText(english.slice(0, index));
-
-      if (index >= english.length) {
-        clearInterval(typeTimer);
-
-        // Short pause before Bengali
-        bengaliTimer = setTimeout(() => {
-          setText(`🙏 ${bengali}`);
-
-          // Short pause before returning to English
-          englishTimer = setTimeout(() => {
-            setText(english);
-          }, 550);
-        }, 300);
-      }
-    }, 100);
-
-    return () => {
-      clearInterval(typeTimer);
-      clearTimeout(bengaliTimer);
-      clearTimeout(englishTimer);
-    };
-  }, [firstName]);
-
-  return (
-    <h1>
-      {text.startsWith('🙏') ? '' : '👋 '}
-      {text}
-    </h1>
-  );
+  const { i18n } = useTranslation();
+  return <h1>{i18n.resolvedLanguage === 'bn' ? 'নমস্কার, ' : 'Hello, '}<em>{name?.split(' ')[0] || (i18n.resolvedLanguage === 'bn' ? 'নাগরিক' : 'neighbour')}.</em></h1>;
 }
 export default function Dashboard() {
   const { t } = useTranslation(['citizen', 'common']);
   const [items, setItems] = useState([]);
   const [msg, setMsg] = useState('');
+  const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const r = await getMyGrievances();
-        setItems(r.data.data);
-        setMsg('');
-      } catch (e) {
-        setMsg(t('dashboard.loadError'));
-      }
-    };
-
-    load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const load = async () => {
+    setLoading(true);
     try {
       const r = await getMyGrievances();
       setItems(r.data.data);
       setMsg('');
     } catch (e) {
       setMsg(t('dashboard.loadError'));
-    }
+    } finally { setLoading(false); }
   };
+
+  useEffect(() => { load(); }, []);
 
   const pending = items.filter(
     (x) => x.status === 'pending'
@@ -119,7 +64,7 @@ export default function Dashboard() {
         <div className="actions">
           <button
             className="ghost-btn"
-            onClick={load}
+            onClick={load} disabled={loading}
           >
             ↻ {t('dashboard.refresh')}
           </button>
@@ -190,7 +135,7 @@ export default function Dashboard() {
           </div>
         )}
 
-        {items.length === 0 && !msg ? (
+        {loading ? <div className="loading-state" role="status">{t('dashboard.loading')}</div> : items.length === 0 && !msg ? (
           <div className="empty">
             <div className="empty-icon">⌁</div>
 

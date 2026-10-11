@@ -1,3 +1,4 @@
+import useDialog from '../hooks/useDialog';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { sendChatMessage } from '../api/assistant.api';
@@ -29,6 +30,16 @@ function formatMessage(text) {
 export default function AiAssistant() {
   const { t, i18n } = useTranslation('citizen');
   const [open, setOpen] = useState(false);
+  const dialogRef = useDialog(open, () => setOpen(false));
+  useEffect(() => {
+    const closeOther = event => { if (event.detail !== 'assistant') setOpen(false); };
+    window.addEventListener('samadhan:help', closeOther);
+    return () => window.removeEventListener('samadhan:help', closeOther);
+  }, []);
+  const toggle = () => {
+    if (!open) window.dispatchEvent(new CustomEvent('samadhan:help', { detail: 'assistant' }));
+    setOpen(value => !value);
+  };
   const [messages, setMessages] = useState([
     { role: 'assistant', content: t('assistant.welcome') },
   ]);
@@ -95,7 +106,7 @@ export default function AiAssistant() {
   return (
     <div className="ai-assistant">
       {open && (
-        <div className="ai-panel panel">
+        <div ref={dialogRef} className="ai-panel panel" role="dialog" aria-modal="true" aria-label={t('assistant.title')}>
           <div className="ai-panel-head">
             <div className="ai-panel-title">
 
@@ -124,7 +135,7 @@ export default function AiAssistant() {
             </button>
           </div>
 
-          <div className="ai-body">
+          <div className="ai-body" role="log" aria-live="polite">
             {messages.map((m, i) => (
               <div
                 key={i}
@@ -159,7 +170,7 @@ export default function AiAssistant() {
             onSubmit={send}
           >
             <input
-              placeholder={t('assistant.inputPlaceholder')}
+              aria-label={t('assistant.inputPlaceholder')} placeholder={t('assistant.inputPlaceholder')}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               disabled={loading}
@@ -180,7 +191,7 @@ export default function AiAssistant() {
       <button
         type="button"
         className="ai-fab"
-        onClick={() => setOpen((o) => !o)}
+        onClick={toggle} aria-expanded={open}
         aria-label={
           open
             ? t('assistant.closeFabAria')

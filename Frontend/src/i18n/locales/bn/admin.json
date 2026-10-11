@@ -50,7 +50,8 @@
       "status": "স্ট্যাটাস",
       "resolutionPhoto": "পরে",
       "update": "আপডেট"
-    }
+    },
+    "loading": "প্রতিবেদন লোড হচ্ছে…"
   },
   "grievanceManage": {
     "heading": "অভিযোগ ব্যবস্থাপনা",

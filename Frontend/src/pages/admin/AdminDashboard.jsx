@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getAllGrievances, updateStatus } from '../../api/grievance.api';
@@ -35,18 +36,20 @@ export default function AdminDashboard() {
   const { t } = useTranslation(['admin', 'common']);
   const ALL_DISTRICTS = t('dashboard.allDistricts');
   const [items, setItems] = useState([]);
-  const [selectedDistrict, setSelectedDistrict] = useState(ALL_DISTRICTS);
+  const [selectedDistrict, setSelectedDistrict] = useState('all');
   const [msg, setMsg] = useState('');
+  const [loading, setLoading] = useState(true);
   const [resolvingId, setResolvingId] = useState(null);
 
   const load = async () => {
+    setLoading(true);
     try {
       const r = await getAllGrievances();
       setItems(r.data.data);
       setMsg('');
     } catch (e) {
       setMsg(t('dashboard.loadError'));
-    }
+    } finally { setLoading(false); }
   };
 
   useEffect(() => {
@@ -74,7 +77,7 @@ export default function AdminDashboard() {
 
   // Filter grievances according to selected district
   const filteredItems =
-    selectedDistrict === ALL_DISTRICTS
+    selectedDistrict === 'all'
       ? items
       : items.filter(
           (g) =>
@@ -159,6 +162,7 @@ export default function AdminDashboard() {
             {/* District filter */}
             <select
               className="select-status"
+              aria-label={ALL_DISTRICTS}
               value={selectedDistrict}
               onChange={(e) => setSelectedDistrict(e.target.value)}
               style={{
@@ -167,7 +171,7 @@ export default function AdminDashboard() {
                 cursor: 'pointer',
               }}
             >
-              <option value={ALL_DISTRICTS}>{ALL_DISTRICTS}</option>
+              <option value="all">{ALL_DISTRICTS}</option>
               {WEST_BENGAL_DISTRICTS.map((district) => (
                 <option key={district} value={district}>
                   {district}
@@ -177,7 +181,7 @@ export default function AdminDashboard() {
 
             <button
               className="ghost-btn"
-              onClick={load}
+              onClick={load} disabled={loading}
             >
               ↻ {t('dashboard.refresh')}
             </button>
@@ -193,14 +197,14 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {filteredItems.length === 0 && !msg ? (
+        {loading ? <div className="loading-state" role="status">{t('dashboard.loading')}</div> : filteredItems.length === 0 && !msg ? (
           <div className="empty">
             <div className="empty-icon">⌁</div>
 
             <strong>{t('dashboard.empty.title')}</strong>
 
             <p>
-              {selectedDistrict === ALL_DISTRICTS
+              {selectedDistrict === 'all'
                 ? t('dashboard.empty.textAll')
                 : t('dashboard.empty.textFiltered', { district: selectedDistrict })}
             </p>
@@ -226,27 +230,27 @@ export default function AdminDashboard() {
               <tbody>
                 {filteredItems.map((g) => (
                   <tr key={g.id}>
-                    <td>
+                    <td data-label={t('dashboard.table.photo')}>
                       <PhotoThumb src={g.photo} />
                     </td>
 
-                    <td>
+                    <td data-label={t('dashboard.table.id')}>
                       #{g.id}
                     </td>
 
-                    <td>
+                    <td data-label={t('dashboard.table.citizen')}>
                       {g.citizen_name}
                     </td>
 
-                    <td className="title-cell">
-                      {g.title}
+                    <td data-label={t('dashboard.table.issue')} className="title-cell">
+                      <Link to={`/admin/grievance/${g.id}`}>{g.title}</Link>
                     </td>
 
-                    <td>
+                    <td data-label={t('dashboard.table.category')}>
                       {t(`categories.${g.category}`, { ns: 'common', defaultValue: g.category })}
                     </td>
 
-                    <td>
+                    <td data-label={t('dashboard.table.location')}>
                       <MapLink
                         lat={g.latitude}
                         lng={g.longitude}
@@ -254,14 +258,14 @@ export default function AdminDashboard() {
                       />
                     </td>
 
-                    <td>
+                    <td data-label={t('dashboard.table.notify')}>
                       <MunicipalBadge
                         body={g.municipal_body}
                         district={g.municipal_district}
                       />
                     </td>
 
-                    <td>
+                    <td data-label={t('dashboard.table.status')}>
                       <span
                         className={`status ${g.status}`}
                       >
@@ -269,13 +273,13 @@ export default function AdminDashboard() {
                       </span>
                     </td>
 
-                    <td>
+                    <td data-label={t('dashboard.table.resolutionPhoto')}>
                       <PhotoThumb src={g.resolution_photo} />
                     </td>
 
-                    <td>
+                    <td data-label={t('dashboard.table.update')}>
                       <select
-                        className="select-status"
+                        aria-label={t('dashboard.table.update') + ' #' + g.id} className="select-status"
                         value={g.status}
                         onChange={(e) =>
                           change(g.id, e.target.value)

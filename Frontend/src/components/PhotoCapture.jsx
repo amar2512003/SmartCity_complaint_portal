@@ -1,3 +1,4 @@
+import useDialog from '../hooks/useDialog';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { assignMunicipalBody } from '../utils/municipalBody';
@@ -32,7 +33,7 @@ async function reverseGeocode(lat, lng) {
     // in utils/municipalBody.js and misroutes the report.
     const res = await fetch(
       `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&addressdetails=1&zoom=18&accept-language=en`,
-      { headers: { Accept: 'application/json' } }
+      { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(6000) }
     );
     if (!res.ok) return null;
     const data = await res.json();
@@ -129,7 +130,8 @@ export default function PhotoCapture({ value, onChange, onLocationChange, label,
   const displayLabel = label ?? t('photoCapture.label');
 
   const [open, setOpen] = useState(false);
-  const [stream, setStream] = useState(null);
+  const streamRef = useRef(null);
+  const cameraRequest = useRef(0);
   const [facing, setFacing] = useState('environment');
   const [camError, setCamError] = useState('');
   const [starting, setStarting] = useState(false);
@@ -139,10 +141,10 @@ export default function PhotoCapture({ value, onChange, onLocationChange, label,
   const fileInputRef = useRef(null);
   const geoRef = useRef(null); // latest geo, read synchronously at capture time
 
-  const stopStream = (s) => { (s || stream)?.getTracks()?.forEach((t) => t.stop()); };
+  const stopStream = () => { streamRef.current?.getTracks().forEach(track => track.stop()); streamRef.current = null; };
 
-  const locate = () => {
-    if (!navigator.geolocation) { setGeoStatus('error'); return; }
+  const locate = () => new Promise(resolve => {
+    if (!navigator.geolocation) { setGeoStatus('error'); resolve(null); return; }
     setGeoStatus('locating');
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
@@ -166,26 +168,31 @@ export default function PhotoCapture({ value, onChange, onLocationChange, label,
           municipalBody: muni.municipalBody || null,
           municipalDistrict: muni.district || null,
         });
+        resolve(full);
       },
-      () => { geoRef.current = null; setGeoStatus('error'); onLocationChange?.(null); },
+      () => { geoRef.current = null; setGeoStatus('error'); onLocationChange?.(null); resolve(null); },
       { enableHighAccuracy: true, timeout: 12000, maximumAge: 30000 }
     );
-  };
+  });
 
   const startCamera = async (mode = facing) => {
     setCamError(''); setStarting(true);
+    const request = ++cameraRequest.current;
     stopStream();
     try {
       const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: mode }, audio: false });
-      setStream(s); setFacing(mode);
+      if (request !== cameraRequest.current) { s.getTracks().forEach(track => track.stop()); return; }
+      streamRef.current = s; setFacing(mode);
       if (videoRef.current) { videoRef.current.srcObject = s; await videoRef.current.play(); }
     } catch (e) {
-      setCamError(t('photoCapture.cameraUnavailable'));
-    } finally { setStarting(false); }
+      if (request === cameraRequest.current) setCamError(t('photoCapture.cameraUnavailable'));
+    } finally { if (request === cameraRequest.current) setStarting(false); }
   };
 
-  const openCamera = () => { setOpen(true); startCamera('environment'); locate(); };
-  const closeCamera = () => { stopStream(); setStream(null); setOpen(false); setCamError(''); };
+  const openCamera = () => { setOpen(true); locate(); };
+  const closeCamera = () => { ++cameraRequest.current; stopStream(); setOpen(false); setCamError(''); };
+  const dialogRef = useDialog(open, closeCamera);
+  useEffect(() => { if (open) startCamera('environment'); return () => { ++cameraRequest.current; stopStream(); }; }, [open]);
   const flipCamera = () => startCamera(facing === 'environment' ? 'user' : 'environment');
 
   const capture = () => {
@@ -199,13 +206,15 @@ export default function PhotoCapture({ value, onChange, onLocationChange, label,
   const onFile = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    locate();
+    if (!file.type.startsWith('image/')) return;
+    const location = locate();
     const img = new Image();
     const reader = new FileReader();
     reader.onload = () => {
-      img.onload = () => {
-        // give geolocation + reverse geocoding a moment to resolve so the upload path is stamped too
-        setTimeout(() => onChange(toStampedDataUrl(img, img.width, img.height, geoRef.current)), 1400);
+      img.onload = async () => {
+        const capturedLocation = await location;
+        onChange(toStampedDataUrl(img, img.width, img.height, capturedLocation));
+        closeCamera();
       };
       img.src = reader.result;
     };
@@ -213,17 +222,17 @@ export default function PhotoCapture({ value, onChange, onLocationChange, label,
     e.target.value = '';
   };
 
-  useEffect(() => () => stopStream(), []); // eslint-disable-line
 
   return (
     <div className="photo-capture">
+      <input ref={fileInputRef} type="file" accept="image/*" hidden onChange={onFile} />
       <label>{displayLabel}{required && <span className="required-mark"> *</span>}</label>
       {value ? (
         <div className="photo-preview">
           <img src={value} alt={t('photoCapture.capturedEvidenceAlt')} />
           <div className="photo-preview-actions">
             <button type="button" className="ghost-btn" onClick={openCamera}>↻ {t('photoCapture.retake')}</button>
-            <button type="button" className="ghost-btn danger-ghost" onClick={() => { onChange(''); setGeo(null); setGeoStatus('idle'); onLocationChange?.(null); }}>✕ {t('photoCapture.remove')}</button>
+            <button type="button" className="ghost-btn danger-ghost" onClick={() => { onChange(''); setGeo(null); geoRef.current = null; setGeoStatus('idle'); onLocationChange?.(null); }}>✕ {t('photoCapture.remove')}</button>
           </div>
         </div>
       ) : (
@@ -233,8 +242,9 @@ export default function PhotoCapture({ value, onChange, onLocationChange, label,
           <p>{t('photoCapture.dropzoneText')}</p>
           <div className="photo-dropzone-actions">
             <button type="button" className="primary-btn" onClick={openCamera}>📸 {t('photoCapture.clickPicture')}</button>
+            <button type="button" className="ghost-btn" onClick={() => fileInputRef.current?.click()}>{t('photoCapture.choosePhoto')}</button>
           </div>
-          <input ref={fileInputRef} type="file" accept="image/*" capture="environment" hidden onChange={onFile} />
+
         </div>
       )}
 
@@ -268,7 +278,7 @@ export default function PhotoCapture({ value, onChange, onLocationChange, label,
       )}
 
       {open && (
-        <div className="camera-modal" role="dialog" aria-modal="true">
+        <div ref={dialogRef} aria-label={displayLabel} className="camera-modal" role="dialog" aria-modal="true">
           <div className="camera-modal-inner">
             <button type="button" className="camera-close" onClick={closeCamera} aria-label={t('photoCapture.closeCameraAria')}>✕</button>
             <div className="camera-stage">
@@ -292,7 +302,7 @@ export default function PhotoCapture({ value, onChange, onLocationChange, label,
             {!camError && (
               <div className="camera-controls">
                 <button type="button" className="camera-flip" onClick={flipCamera} title={t('photoCapture.switchCamera')}>⟳</button>
-                <button type="button" className="shutter-btn" onClick={capture} aria-label={t('photoCapture.capturePhotoAria')} />
+                <button type="button" className="shutter-btn" onClick={capture} disabled={starting} aria-label={t('photoCapture.capturePhotoAria')} />
                 <span className="camera-flip-spacer" />
               </div>
             )}

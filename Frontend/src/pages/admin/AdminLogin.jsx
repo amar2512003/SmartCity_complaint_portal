@@ -1,2 +1,67 @@
-import {useState} from 'react'; import {Link} from 'react-router-dom'; import {useTranslation} from 'react-i18next'; import {adminLogin} from '../../api/adminAuth.api'; import {useAuth} from '../../context/AuthContext'; import Message from '../../components/Message'; import LanguageToggle from '../../components/LanguageToggle';
-export default function AdminLogin(){const {t}=useTranslation('admin');const [f,setF]=useState({email:'',password:''});const [msg,setMsg]=useState('');const {login}=useAuth();const submit=async e=>{e.preventDefault();try{const r=await adminLogin(f);login(r.data.data)}catch(e){setMsg(e.response?.data?.message||t('login.unableToSignIn'))}};return <div className="auth-page"><section className="auth-visual"><Link className="brand" to="/citizen/login"><span className="brand-mark">⌂</span><span>Samadhan.</span></Link><div className="auth-copy"><span className="eyebrow">{t('login.eyebrow')}</span><h1>{t('login.heading')}</h1><p>{t('login.intro')}</p></div><div className="city-grid">{Array.from({length:8},(_,i)=><span key={i}/>)}</div></section><section className="auth-form-side"><LanguageToggle /><div className="auth-card"><Link className="brand" to="/citizen/login"><span className="brand-mark">⌂</span><span>Samadhan Admin</span></Link><h2>{t('login.signIn')}</h2><p className="subtitle">{t('login.subtitle')}</p><form onSubmit={submit}><div className="field"><label>{t('login.emailLabel')}</label><input type="email" value={f.email} onChange={e=>setF({...f,email:e.target.value})} required/></div><div className="field"><label>{t('login.passwordLabel')}</label><input type="password" value={f.password} onChange={e=>setF({...f,password:e.target.value})} required/></div><button className="primary-btn full" type="submit">{t('login.openDashboard')} <span>→</span></button></form><Message text={msg} error/><div className="link-row"><Link to="/citizen/login">{t('login.backToCitizenPortal')}</Link></div></div></section></div>}
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { adminLogin } from "../../api/adminAuth.api";
+import { useAuth } from "../../context/AuthContext";
+import Message from "../../components/Message";
+import AuthLayout from "../../components/AuthLayout";
+export default function AdminLogin() {
+  const { t } = useTranslation("admin");
+  const [form, setForm] = useState({ email: "", password: "" });
+  const [msg, setMsg] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
+  const submit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setMsg("");
+    try {
+      const r = await adminLogin(form);
+      login(r.data.data);
+    } catch (e) {
+      setMsg(e.response?.data?.message || t("login.unableToSignIn"));
+    } finally {
+      setLoading(false);
+    }
+  };
+  return (
+    <AuthLayout admin>
+      <span className="eyebrow">{t("nav.badge")}</span>
+      <h2>{t("login.signIn")}</h2>
+      <p className="subtitle">{t("login.subtitle")}</p>
+      <form onSubmit={submit}>
+        <div className="field">
+          <label htmlFor="admin-email">{t("login.emailLabel")}</label>
+          <input
+            id="admin-email"
+            type="email"
+            autoComplete="username"
+            placeholder="admin@smartcity.com"
+            value={form.email}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            required
+          />
+        </div>
+        <div className="field">
+          <label htmlFor="admin-password">{t("login.passwordLabel")}</label>
+          <input
+            id="admin-password"
+            type="password"
+            autoComplete="current-password"
+            value={form.password}
+            onChange={(e) => setForm({ ...form, password: e.target.value })}
+            required
+          />
+        </div>
+        <button className="primary-btn full" type="submit" disabled={loading}>
+          {loading ? "…" : t("login.openDashboard")}{" "}
+          <span aria-hidden="true">→</span>
+        </button>
+      </form>
+      <Message text={msg} error />
+      <div className="link-row">
+        <Link to="/citizen/login">← {t("login.backToCitizenPortal")}</Link>
+      </div>
+    </AuthLayout>
+  );
+}
