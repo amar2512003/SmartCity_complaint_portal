@@ -1,5 +1,4 @@
 import { findUserByEmail, createUser, updatePreferredLanguage as updatePreferredLanguageInDb } from '../models/user.model.js';
-import { db } from '../config/db.js';
 import { deletePendingSignup, createPendingSignup, findPendingSignup, incrementAttempts, deleteOtp } from '../models/otp.model.js';
 import { hashPassword, comparePassword } from '../utils/hash.util.js';
 import { signToken } from '../utils/jwt.util.js';
@@ -14,7 +13,7 @@ import { t } from '../i18n/index.js';
 async function createOtp(email, name, purpose, lang) {
   const otp = generateOtp();
   const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
-  await db('email_otps').where({ email, purpose }).del();
+  await deletePendingSignup(email, purpose);
   await createPendingSignup({
     email,
     name: name || '',

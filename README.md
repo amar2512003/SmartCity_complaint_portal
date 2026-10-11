@@ -1,53 +1,40 @@
 # Samadhan
 
-Simple React + Express + PostgreSQL smart-city grievance portal.
+React + Express + MongoDB smart-city grievance portal. Frontend and backend can remain on Vercel; MongoDB Atlas hosts the database.
 
-## Email OTP signup
+See [MongoDB setup and Vercel cutover](docs/mongodb-setup.md) for the complete deployment steps and existing-data considerations.
 
-Citizen signup now uses email verification:
+## Local setup
 
-1. Enter name, email and password.
-2. Click **Verify email**.
-3. Backend generates a 6-digit OTP and emails it.
-4. Enter the OTP in the frontend.
-5. Only after successful verification is the citizen account created.
-
-### Gmail setup (easy local-development option)
-
-Use a Gmail account and a Google **App Password**. Do not put your normal Gmail password in `.env`.
-
-In `backend/.env` set:
-
-```env
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_SECURE=false
-SMTP_USER=yourgmail@gmail.com
-SMTP_PASS=your_16_character_app_password
-```
-
-Then install the new backend dependency:
+Use Node.js 22. Copy `backend/.env.example` to `backend/.env` and fill in MongoDB, JWT, SMTP, and your chosen admin credentials. Do not commit `.env`.
 
 ```bash
 cd backend
-npm install
-npm run migrate
+npm ci
+npm run db:setup
+npm run seed
 npm run dev
 ```
 
-The new migration creates the `email_otps` table.
+`db:setup` creates MongoDB indexes, including unique user emails and expiry cleanup for OTPs. `npm run migrate` is an alias for this setup; it does not copy Supabase data. `seed` creates your admin once and never resets an existing password.
 
-Frontend:
+In another terminal, copy `Frontend/.env.example` to `Frontend/.env`, then:
 
 ```bash
-cd frontend
-npm install
+cd Frontend
+npm ci
 npm run dev
 ```
 
-## Ports
+Frontend: http://localhost:5173. Backend with the example configuration: http://localhost:5001.
 
-Frontend: `http://localhost:5173`
-Backend: `http://localhost:5001`
-PostgreSQL: `localhost:5432`
-Database: `smart_city`
+Citizen signup and login use emailed OTPs. For Gmail SMTP, use an App Password in `SMTP_PASS`, with `SMTP_HOST=smtp.gmail.com`, `SMTP_PORT=587`, `SMTP_SECURE=false`, and `SMTP_USER` set to your email.
+
+## Verification
+
+```bash
+cd backend
+npm test
+```
+
+Tests start an isolated temporary MongoDB process (the first run downloads a MongoDB binary); they never use your Atlas database. They exercise unique IDs/emails, OTP signup/login/expiry/attempts, admin login, citizen isolation, complaint listing, status updates, and location-checked resolution.

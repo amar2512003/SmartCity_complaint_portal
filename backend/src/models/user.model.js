@@ -1,5 +1,17 @@
-import { db } from '../config/db.js';
-export const findUserByEmail=(email)=>db('users').where({email}).first();
-export const findUserById=(id)=>db('users').where({id}).first();
-export const createUser=async({name,email,passwordHash})=>{const [u]=await db('users').insert({name,email,password_hash:passwordHash,role:'citizen'}).returning(['id','name','email','role']);return u;};
-export const updatePreferredLanguage=async(id,language)=>{const [u]=await db('users').where({id}).update({preferred_language:language}).returning(['id','name','email','role','preferred_language']);return u;};
+import { getDb, nextId, numericId, withoutMongoId } from '../config/db.js';
+
+const publicFields = { _id: 0, id: 1, name: 1, email: 1, role: 1, preferred_language: 1 };
+export const findUserByEmail = async (email) => (await getDb()).collection('users').findOne({ email }, withoutMongoId);
+export const findUserById = async (id) => (await getDb()).collection('users').findOne({ id: numericId(id) }, withoutMongoId);
+export async function createUser({ name, email, passwordHash, role = 'citizen' }) {
+  const db = await getDb();
+  const now = new Date();
+  const user = { id: await nextId('users'), name, email, password_hash: passwordHash ?? null, role,
+    preferred_language: 'en', created_at: now, updated_at: now };
+  await db.collection('users').insertOne(user);
+  return { id: user.id, name, email, role, preferred_language: 'en' };
+}
+export const updatePreferredLanguage = async (id, language) => (await getDb()).collection('users').findOneAndUpdate(
+  { id: numericId(id) }, { $set: { preferred_language: language, updated_at: new Date() } },
+  { projection: publicFields, returnDocument: 'after', includeResultMetadata: false },
+);

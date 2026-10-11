@@ -1,21 +1,41 @@
-import { db } from '../config/db.js';
-export const createGrievance=async({citizenId,title,description,category,photo,latitude,longitude,locationAccuracy,locationAddress,municipalBody,municipalDistrict})=>{const [g]=await db('grievances').insert({citizen_id:citizenId,title,description,category,photo:photo||null,latitude:latitude??null,longitude:longitude??null,location_accuracy:locationAccuracy??null,location_address:locationAddress||null,municipal_body:municipalBody||null,municipal_district:municipalDistrict||null,status:'pending'}).returning('*');return g;};
-export const getCitizenGrievances=(citizenId)=>db('grievances').where({citizen_id:citizenId}).orderBy('created_at','desc');
-export const getAllGrievances=()=>db('grievances').join('users','users.id','grievances.citizen_id').select('grievances.*','users.name as citizen_name','users.email as citizen_email').orderBy('grievances.created_at','desc');
-export const updateGrievanceStatus=async(id,status)=>{const [g]=await db('grievances').where({id}).update({status,updated_at:db.fn.now()}).returning('*');return g;};
-export const getGrievanceById=(id)=>db('grievances').where({id}).first();
-export const resolveGrievance=async(id,{adminId,photo,latitude,longitude,locationAccuracy,locationAddress,distanceMeters})=>{
-  const [g]=await db('grievances').where({id}).update({
-    status:'resolved',
-    resolution_photo:photo,
-    resolution_latitude:latitude,
-    resolution_longitude:longitude,
-    resolution_accuracy:locationAccuracy??null,
-    resolution_address:locationAddress||null,
-    resolution_distance_meters:distanceMeters,
-    resolved_at:db.fn.now(),
-    resolved_by_admin_id:adminId,
-    updated_at:db.fn.now(),
-  }).returning('*');
-  return g;
-};
+import { getDb, nextId, numericId, withoutMongoId, updatedDocument } from '../config/db.js';
+
+export async function createGrievance({ citizenId, title, description, category, photo, latitude, longitude,
+  locationAccuracy, locationAddress, municipalBody, municipalDistrict }) {
+  const db = await getDb();
+  const citizen = await db.collection('users').findOne({ id: numericId(citizenId), role: 'citizen' });
+  if (!citizen) throw new Error('Citizen account not found');
+  const now = new Date();
+  const grievance = { id: await nextId('grievances'), citizen_id: citizen.id, title, description, category,
+    photo: photo || null, latitude: latitude ?? null, longitude: longitude ?? null,
+    location_accuracy: locationAccuracy ?? null, location_address: locationAddress || null,
+    municipal_body: municipalBody || null, municipal_district: municipalDistrict || null, status: 'pending',
+    resolution_photo: null, resolution_latitude: null, resolution_longitude: null, resolution_accuracy: null,
+    resolution_address: null, resolution_distance_meters: null, resolved_at: null, resolved_by_admin_id: null,
+    created_at: now, updated_at: now };
+  await db.collection('grievances').insertOne(grievance);
+  const { _id, ...result } = grievance;
+  return result;
+}
+export const getCitizenGrievances = async (citizenId) => (await getDb()).collection('grievances')
+  .find({ citizen_id: numericId(citizenId) }, withoutMongoId).sort({ created_at: -1, id: -1 }).toArray();
+export const getAllGrievances = async () => (await getDb()).collection('grievances').aggregate([
+  { $sort: { created_at: -1, id: -1 } },
+  { $lookup: { from: 'users', localField: 'citizen_id', foreignField: 'id', as: 'citizen' } },
+  { $unwind: '$citizen' },
+  { $set: { citizen_name: '$citizen.name', citizen_email: '$citizen.email' } },
+  { $project: { _id: 0, citizen: 0 } },
+]).toArray();
+export const updateGrievanceStatus = async (id, status) => (await getDb()).collection('grievances').findOneAndUpdate(
+  { id: numericId(id) }, { $set: { status, updated_at: new Date() } }, updatedDocument);
+export const getGrievanceById = async (id) => (await getDb()).collection('grievances').findOne({ id: numericId(id) }, withoutMongoId);
+export async function resolveGrievance(id, { adminId, photo, latitude, longitude, locationAccuracy, locationAddress, distanceMeters }) {
+  const db = await getDb();
+  if (!await db.collection('users').findOne({ id: numericId(adminId), role: 'admin' })) throw new Error('Admin account not found');
+  const now = new Date();
+  return db.collection('grievances').findOneAndUpdate({ id: numericId(id) }, { $set: {
+    status: 'resolved', resolution_photo: photo, resolution_latitude: latitude, resolution_longitude: longitude,
+    resolution_accuracy: locationAccuracy ?? null, resolution_address: locationAddress || null,
+    resolution_distance_meters: distanceMeters, resolved_at: now, resolved_by_admin_id: numericId(adminId), updated_at: now,
+  } }, updatedDocument);
+}
