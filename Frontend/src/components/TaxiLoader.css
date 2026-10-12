@@ -1,0 +1,16 @@
+.taxi-loader { padding: 30px 24px 34px; text-align: center; color: var(--muted); }
+.taxi-loading-road { position: relative; width: min(420px, 100%); height: 100px; margin: 0 auto; overflow: hidden; border-bottom: 2px solid #e4e8dd; }
+.taxi-drive { position: absolute; bottom: 0; width: 132px; left: 0; animation: taxi-crossing 3.8s linear infinite; }
+.taxi-car { display: block; width: 100%; height: auto; overflow: visible; }
+.taxi-body { animation: taxi-bounce .5s ease-in-out infinite alternate; }
+.taxi-wheel { animation: taxi-wheel-turn .65s linear infinite; }
+.taxi-loader p { margin: 18px 0 0; font-size: 14px; }
+@keyframes taxi-crossing { from { left: 0; transform: translateX(-100%); } to { left: 100%; transform: translateX(0); } }
+/* Show the taxi immediately, even when the request finishes quickly. */
+.taxi-drive { animation-delay: -.8s; }
+@keyframes taxi-bounce { from { transform: translateY(0); } to { transform: translateY(-1px); } }
+@keyframes taxi-wheel-turn { to { transform: rotate(360deg); } }
+@media(prefers-reduced-motion: reduce) {
+  .taxi-drive { animation: none; left: 50%; transform: translateX(-50%); }
+  .taxi-body, .taxi-wheel { animation: none; }
+}

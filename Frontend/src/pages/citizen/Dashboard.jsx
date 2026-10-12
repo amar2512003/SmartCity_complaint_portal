@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { getMyGrievances } from '../../api/grievance.api';
 import { useAuth } from '../../context/AuthContext';
 import ReportDate from '../../components/ReportDate';
+import TaxiLoader from '../../components/TaxiLoader';
 import KolkataRiverScene from '../../components/KolkataRiverScene';
 
 function AnimatedGreeting({ name }) {
@@ -174,7 +175,7 @@ export default function Dashboard() {
           </div>
         )}
 
-        {loading ? <div className="loading-state" role="status">{t('dashboard.loading')}</div> : items.length === 0 && !msg ? (
+        {loading ? <TaxiLoader label={t('dashboard.loading')} /> : items.length === 0 && !msg ? (
           <div className="empty">
             <div className="empty-icon">⌁</div>
 
