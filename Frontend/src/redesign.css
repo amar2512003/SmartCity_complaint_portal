@@ -1885,3 +1885,14 @@ td {
   .track-status-button { align-self: flex-end; }
   .citizen-report-summary h3 { font-size: 15px; }
 }
+
+.dashboard-greeting { display: inline-block; animation: greeting-arrive .22s ease-out both; }
+.greeting-salutation { white-space: nowrap; }
+.greeting-gesture { display: inline-block; font-size: .7em; vertical-align: .06em; }
+@keyframes greeting-arrive {
+  from { opacity: .3; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media(prefers-reduced-motion: reduce) {
+  .dashboard-greeting { animation: none; }
+}

@@ -8,7 +8,45 @@ import KolkataRiverScene from '../../components/KolkataRiverScene';
 
 function AnimatedGreeting({ name }) {
   const { i18n } = useTranslation();
-  return <h1>{i18n.resolvedLanguage === 'bn' ? 'নমস্কার, ' : 'Hello, '}<em>{name?.split(' ')[0] || (i18n.resolvedLanguage === 'bn' ? 'নাগরিক' : 'neighbour')}.</em></h1>;
+  const bengaliUI = i18n.resolvedLanguage === 'bn';
+  const firstName = name?.trim().split(/\s+/)[0] || (bengaliUI ? 'নাগরিক' : 'neighbour');
+  const [phase, setPhase] = useState('hello');
+
+  useEffect(() => {
+    const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let namaskarTimer;
+    let returnTimer;
+    const start = () => {
+      clearTimeout(namaskarTimer);
+      clearTimeout(returnTimer);
+      if (motion.matches) {
+        setPhase(bengaliUI ? 'namaskar' : 'hello');
+        return;
+      }
+      setPhase('hello');
+      namaskarTimer = setTimeout(() => setPhase('namaskar'), 800);
+      if (!bengaliUI) returnTimer = setTimeout(() => setPhase('hello'), 1800);
+    };
+    start();
+    motion.addEventListener('change', start);
+    return () => {
+      clearTimeout(namaskarTimer);
+      clearTimeout(returnTimer);
+      motion.removeEventListener('change', start);
+    };
+  }, [firstName, bengaliUI]);
+
+  return (
+    <h1 aria-label={`${bengaliUI ? 'নমস্কার' : 'Hello'}, ${firstName}.`}>
+      <span key={phase} className="dashboard-greeting" aria-hidden="true">
+        <span className="greeting-salutation" lang={phase === 'namaskar' ? 'bn' : 'en'}>
+          <span className="greeting-gesture">{phase === 'namaskar' ? '🙏' : '👋'}</span>{' '}
+          {phase === 'namaskar' ? 'নমস্কার, ' : 'Hello, '}
+        </span>
+        <em>{firstName}.</em>
+      </span>
+    </h1>
+  );
 }
 export default function Dashboard() {
   const { t } = useTranslation(['citizen', 'common']);
