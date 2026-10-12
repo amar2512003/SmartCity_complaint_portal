@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getMyGrievances } from '../../api/grievance.api';
-import PhotoThumb from '../../components/PhotoThumb';
+import ReportDate from '../../components/ReportDate';
+import ResolutionEvidence from '../../components/ResolutionEvidence';
 import MapLink from '../../components/MapLink';
 import MunicipalBadge from '../../components/MunicipalBadge';
 
@@ -72,38 +73,24 @@ export default function GrievanceDetail() {
             </span>
           </div>
 
-          <p className="grievance-detail-description">{grievance.description}</p>
+          <p className="report-submitted-date">{t('dashboard.submitted')} <ReportDate value={grievance.created_at} /></p>
+          <section className="report-detail-section">
+            <h3>{t('grievanceForm.fields.descriptionLabel')}</h3>
+            <p className="grievance-detail-description">{grievance.description}</p>
+          </section>
 
           <div className="grievance-detail-meta">
-            <MapLink source={grievance.location_source} lat={grievance.latitude} lng={grievance.longitude} address={grievance.location_address} />
+            <section className="report-detail-section">
+              <h3>{t('dashboard.table.location')}</h3>
+              <MapLink source={grievance.location_source} lat={grievance.latitude} lng={grievance.longitude} address={grievance.location_address} />
+            </section>
+            <section className="report-detail-section">
+              <h3>{t('dashboard.table.routedTo')}</h3>
             <MunicipalBadge body={grievance.municipal_body} district={grievance.municipal_district} />
+            </section>
           </div>
 
-          <div className="before-after-grid">
-            <div className="before-after-card">
-              <span className="before-after-label">{t('grievanceDetail.beforePhoto')}</span>
-              <PhotoThumb src={grievance.photo} alt={t('grievanceDetail.beforePhoto')} />
-            </div>
-
-            <div className="before-after-card">
-              <span className="before-after-label">{t('grievanceDetail.afterPhoto')}</span>
-              {grievance.resolution_photo ? (
-                <>
-                  <PhotoThumb src={grievance.resolution_photo} alt={t('grievanceDetail.afterPhoto')} />
-                  {grievance.resolved_at && (
-                    <span className="before-after-timestamp">
-                      {t('grievanceDetail.resolvedOn', { date: new Date(grievance.resolved_at).toLocaleDateString() })}
-                    </span>
-                  )}
-                </>
-              ) : (
-                <div className="before-after-pending">
-                  <span className="no-photo">—</span>
-                  <p>{t('grievanceDetail.notResolvedYet')}</p>
-                </div>
-              )}
-            </div>
-          </div>
+          <ResolutionEvidence report={grievance} />
 
           <Link className="ghost-btn" to="/dashboard" style={{ marginTop: 24, display: 'inline-block' }}>
             {t('grievanceDetail.backToDashboard')}

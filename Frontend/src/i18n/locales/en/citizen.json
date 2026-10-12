@@ -94,7 +94,10 @@
       "routedTo": "Routed to",
       "status": "Status"
     },
-    "loading": "Loading reports…"
+    "loading": "Loading reports…",
+    "trackStatus": "Track Status",
+    "submitted": "Submitted",
+    "dateUnavailable": "Date unavailable"
   },
   "grievanceForm": {
     "eyebrow": "CIVIC REPORT",
@@ -232,6 +235,33 @@
         "body": "An admin visits the location and takes a photo after fixing the issue. The grievance can only be marked \"Resolved\" if that photo's location matches the original address."
       }
     ],
-    "footer": "You can track the live status of every grievance you've filed from your Dashboard."
+    "footer": "You can track the live status of every grievance you've filed from your Dashboard.",
+    "teaLabel": "THE CHAI BREAK GUIDE"
+  },
+  "reportFlow": {
+    "heading": "A better neighbourhood starts here.",
+    "subtitle": "Tell us what needs fixing. We’ll help it reach the right team.",
+    "details": "Describe the issue",
+    "detailsHint": "Choose a category and tell us what you noticed.",
+    "evidence": "Add a photo & confirm the location",
+    "evidenceHint": "Show the issue clearly, then check its location on the map.",
+    "checklist": "YOUR REPORT",
+    "progress": "{{count}} of 3 ready",
+    "detailsCheck": "Issue details added",
+    "photoCheck": "Before photo attached",
+    "locationCheck": "Issue location confirmed",
+    "proofTitle": "See the difference.",
+    "proofText": "When the work is resolved, compare your original photo with the team’s completion photo. Both you and the admin can view the evidence.",
+    "submitHint": "Your report will appear in your dashboard after submission.",
+    "routingHint": "Your confirmed location helps route the report to the responsible municipality."
+  },
+  "evidence": {
+    "heading": "Resolution evidence",
+    "hint": "Compare the original issue with the completed work. Select a photo to enlarge.",
+    "before": "Before",
+    "after": "After",
+    "pending": "Completion photo will appear here after resolution.",
+    "missing": "No completion photo is available for this resolved report.",
+    "view": "View comparison"
   }
 }

@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getAllGrievances, updateStatus } from '../../api/grievance.api';
-import PhotoThumb from '../../components/PhotoThumb';
+import ResolutionEvidence from '../../components/ResolutionEvidence';
 import MapLink from '../../components/MapLink';
 import MunicipalBadge from '../../components/MunicipalBadge';
 import ResolveGrievanceModal from '../../components/ResolveGrievanceModal';
@@ -33,7 +33,7 @@ const WEST_BENGAL_DISTRICTS = [
 ];
 
 export default function AdminDashboard() {
-  const { t } = useTranslation(['admin', 'common']);
+  const { t } = useTranslation(['admin', 'common', 'citizen']);
   const ALL_DISTRICTS = t('dashboard.allDistricts');
   const [items, setItems] = useState([]);
   const [selectedDistrict, setSelectedDistrict] = useState('all');
@@ -214,7 +214,7 @@ export default function AdminDashboard() {
             <table>
               <thead>
                 <tr>
-                  <th>{t('dashboard.table.photo')}</th>
+                  <th>{t('evidence.heading', { ns: 'citizen' })}</th>
                   <th>{t('dashboard.table.id')}</th>
                   <th>{t('dashboard.table.citizen')}</th>
                   <th>{t('dashboard.table.issue')}</th>
@@ -222,7 +222,6 @@ export default function AdminDashboard() {
                   <th>{t('dashboard.table.location')}</th>
                   <th>{t('dashboard.table.notify')}</th>
                   <th>{t('dashboard.table.status')}</th>
-                  <th>{t('dashboard.table.resolutionPhoto')}</th>
                   <th>{t('dashboard.table.update')}</th>
                 </tr>
               </thead>
@@ -230,8 +229,9 @@ export default function AdminDashboard() {
               <tbody>
                 {filteredItems.map((g) => (
                   <tr key={g.id}>
-                    <td data-label={t('dashboard.table.photo')}>
-                      <PhotoThumb src={g.photo} />
+                    <td data-label={t('evidence.heading', { ns: 'citizen' })}>
+                      <ResolutionEvidence report={g} compact />
+                      <Link className="evidence-link" to={`/admin/grievance/${g.id}`}>{t('evidence.view', { ns: 'citizen' })} →</Link>
                     </td>
 
                     <td data-label={t('dashboard.table.id')}>
@@ -273,9 +273,7 @@ export default function AdminDashboard() {
                       </span>
                     </td>
 
-                    <td data-label={t('dashboard.table.resolutionPhoto')}>
-                      <PhotoThumb src={g.resolution_photo} />
-                    </td>
+
 
                     <td data-label={t('dashboard.table.update')}>
                       <select
@@ -313,6 +311,7 @@ export default function AdminDashboard() {
       {resolvingId && (
         <ResolveGrievanceModal
           grievanceId={resolvingId}
+              beforePhoto={items.find(g => g.id === resolvingId)?.photo}
           onClose={() => setResolvingId(null)}
           onResolved={handleResolved}
         />

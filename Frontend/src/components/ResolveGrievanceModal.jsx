@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PhotoCapture from './PhotoCapture';
 import Message from './Message';
+import PhotoThumb from './PhotoThumb';
 import { resolveGrievance } from '../api/grievance.api';
 
 // Wraps the existing PhotoCapture component (which already handles camera +
@@ -11,16 +12,17 @@ import { resolveGrievance } from '../api/grievance.api';
 // see backend/src/controllers/admin.controller.js#resolve — this component
 // just surfaces the mismatch error the API sends back if the admin isn't
 // close enough to the reported site.
-export default function ResolveGrievanceModal({ grievanceId, onClose, onResolved }) {
-  const { t } = useTranslation('admin');
+export default function ResolveGrievanceModal({ grievanceId, beforePhoto, onClose, onResolved }) {
+  const { t } = useTranslation(['admin', 'citizen']);
   const [photo, setPhoto] = useState('');
   const [loc, setLoc] = useState(null);
+  const [locationBusy, setLocationBusy] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const dialogRef = useDialog(true, () => { if (!submitting) onClose(); });
 
   const submit = async () => {
-    if (!photo || !loc) {
+    if (!photo || !loc || locationBusy) {
       setError(t('resolveModal.errors.photoRequired'));
       return;
     }
@@ -58,7 +60,10 @@ export default function ResolveGrievanceModal({ grievanceId, onClose, onResolved
         <h3>{t('resolveModal.heading')}</h3>
         <p className="resolve-modal-subtitle">{t('resolveModal.subtitle')}</p>
 
+        {beforePhoto && <div className="resolve-original"><span>{t('evidence.before', { ns: 'citizen' })}</span><PhotoThumb src={beforePhoto} alt={t('evidence.before', { ns: 'citizen' })} /></div>}
+
         <PhotoCapture allowCorrection={false}
+          onBusyChange={setLocationBusy}
           value={photo}
           onChange={setPhoto}
           onLocationChange={setLoc}
@@ -72,7 +77,7 @@ export default function ResolveGrievanceModal({ grievanceId, onClose, onResolved
           <button type="button" className="ghost-btn" onClick={onClose} disabled={submitting}>
             {t('resolveModal.cancel')}
           </button>
-          <button type="button" className="primary-btn" onClick={submit} disabled={submitting || !photo}>
+          <button type="button" className="primary-btn" onClick={submit} disabled={submitting || locationBusy || !photo || !loc}>
             {submitting ? t('resolveModal.submitting') : t('resolveModal.confirm')}
           </button>
         </div>

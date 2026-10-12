@@ -286,6 +286,8 @@ export default function PhotoCapture({ value, onChange, onLocationChange, label,
         </div>
       )}
 
+      {!value && geoStatus === 'locating' && <p role="status" className="geo-badge">{t('photoCapture.gettingLocation')}</p>}
+
       {value && geoStatus !== 'idle' && (
         <div className={`geo-badge geo-${geoStatus}`}>
           {geoStatus === 'locating' && <>📡 {t('photoCapture.gettingLocation')}</>}

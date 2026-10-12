@@ -1,0 +1,41 @@
+.tea-guide .instructions-fab {
+  width: 72px; height: 90px; padding: 0; border: 0; border-radius: 18px;
+  background: transparent; box-shadow: none; color: #984722;
+  filter: drop-shadow(0 5px 5px #69341c18);
+}
+.kullad-tea { width: 100%; height: 100%; display: block; overflow: visible; }
+.tea-guide .instructions-fab:hover { background: #f4e5d54d; transform: translateY(-2px); }
+.tea-steam-wisp { animation: tea-steam-rise 3.6s ease-out infinite; transform-origin: center; }
+.tea-steam-two { animation-delay: -1.2s; }
+.tea-steam-three { animation-delay: -2.4s; }
+@keyframes tea-steam-rise {
+  0% { opacity: 0; transform: translate(0, 7px) scaleX(.8); }
+  25% { opacity: .65; }
+  65% { opacity: .35; }
+  100% { opacity: 0; transform: translate(3px, -13px) scaleX(1.1); }
+}
+.tea-guide .instructions-panel {
+  width: min(390px, calc(100vw - 40px)); max-height: min(650px, calc(100dvh - 140px));
+  background: #fff9ed; border: 1px solid #dcbfa1; border-radius: 22px;
+  box-shadow: 0 18px 60px #673d2726; --line: #ecdbc4;
+}
+.tea-guide .instructions-panel-head { background: #f4e4ce; border-bottom: 1px solid #dfc8ab; padding: 16px; }
+.tea-guide .instructions-avatar { width: 46px; height: 62px; background: transparent; border-radius: 0; margin: 0; }
+.tea-guide .instructions-panel-title { gap: 10px; }
+.tea-guide .instructions-panel-title strong { color: #63381f; font-size: 18px; }
+.tea-guide .instructions-panel-title .tea-guide-eyebrow { color: #985b32; font: 700 9px 'DM Sans', sans-serif; letter-spacing: .15em; margin: 0 0 7px; }
+.tea-guide .instructions-panel-title span { color: #816449; }
+.tea-guide .ai-close { color: #794424; background: #fffaef9e; border: 1px solid #ddc3a6; border-radius: 50%; width: 32px; height: 32px; }
+.tea-guide .instructions-body { background: #fffaf0; padding: 4px 20px 20px; }
+.tea-guide .instructions-step { border-bottom: 1px dashed #e6d4ba; padding-left: 40px; }
+.tea-guide .instructions-panel .instructions-step:before { background: #f2dfc5; color: #8f4b26; border: 1px solid #dfbea0; border-radius: 9px 9px 12px 12px; }
+.tea-guide .instructions-step-heading { color: #683f28; font-size: 15px; line-height: 1.4; }
+.tea-guide .instructions-step-body { color: #79624f; font-size: 12px; line-height: 1.75; }
+.tea-guide .instructions-footer { background: #f5e8d5; border: 0; border-radius: 12px; padding: 14px; color: #84502f; font: italic 13px/1.7 var(--serif); }
+@media(max-width: 600px) {
+  .tea-guide .instructions-fab { width: 60px; height: 76px; }
+  .tea-guide .instructions-panel { left: 10px; right: 10px; width: auto; bottom: calc(100px + env(safe-area-inset-bottom)); max-height: calc(100dvh - 120px); }
+}
+@media(prefers-reduced-motion: reduce) {
+  .tea-steam-wisp { animation: none !important; opacity: .4; }
+}

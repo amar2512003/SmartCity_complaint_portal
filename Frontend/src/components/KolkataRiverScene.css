@@ -1,0 +1,16 @@
+.kolkata-scene { width: 100%; max-width: 490px; justify-self: end; min-width: 0; }
+.kolkata-scene svg { display: block; width: 100%; height: auto; overflow: hidden; }
+.river-ferry-crossing { animation: ferry-crossing 36s linear infinite; }
+.river-ferry-bob { animation: ferry-bob 3.6s ease-in-out infinite; }
+.river-ripples { animation: river-ripple 6s ease-in-out infinite alternate; }
+.river-cloud { animation: river-cloud-drift 16s ease-in-out infinite alternate; }
+@keyframes ferry-crossing { from { transform: translateX(-90px); } to { transform: translateX(565px); } }
+/* Start the first crossing in view, while subsequent loops enter from the edge. */
+.river-ferry-crossing { animation-delay: -13s; }
+@keyframes ferry-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+@keyframes river-ripple { from { transform: translateX(-5px); opacity: .6; } to { transform: translateX(5px); opacity: 1; } }
+@keyframes river-cloud-drift { from { transform: translateX(-8px); } to { transform: translateX(8px); } }
+@media (prefers-reduced-motion: reduce) {
+  .kolkata-scene svg * { animation: none !important; }
+  .kolkata-scene .river-ferry-crossing { transform: translateX(200px); }
+}

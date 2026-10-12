@@ -3,9 +3,8 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getMyGrievances } from '../../api/grievance.api';
 import { useAuth } from '../../context/AuthContext';
-import PhotoThumb from '../../components/PhotoThumb';
-import MapLink from '../../components/MapLink';
-import MunicipalBadge from '../../components/MunicipalBadge';
+import ReportDate from '../../components/ReportDate';
+import KolkataRiverScene from '../../components/KolkataRiverScene';
 
 function AnimatedGreeting({ name }) {
   const { i18n } = useTranslation();
@@ -45,37 +44,40 @@ export default function Dashboard() {
 
   return (
     <>
-      <div className="hero-row">
-        <div>
-          <span
-            className="eyebrow"
-            style={{ color: 'var(--primary)' }}
-          >
-            {t('dashboard.eyebrow')}
-          </span>
+      <div className="hero-row dashboard-hero">
+        <div className="dashboard-welcome">
+          <div>
+            <span
+              className="eyebrow"
+              style={{ color: 'var(--primary)' }}
+            >
+              {t('dashboard.eyebrow')}
+            </span>
 
-          <AnimatedGreeting name={user?.name} />
+            <AnimatedGreeting name={user?.name} />
 
-          <p>
-            {t('dashboard.subtitle')}
-          </p>
+            <p>
+              {t('dashboard.subtitle')}
+            </p>
+          </div>
+
+          <div className="actions">
+            <button
+              className="ghost-btn"
+              onClick={load} disabled={loading}
+            >
+              ↻ {t('dashboard.refresh')}
+            </button>
+
+            <Link
+              className="button"
+              to="/grievance/new"
+            >
+              ＋ {t('dashboard.reportIssue')}
+            </Link>
+          </div>
         </div>
-
-        <div className="actions">
-          <button
-            className="ghost-btn"
-            onClick={load} disabled={loading}
-          >
-            ↻ {t('dashboard.refresh')}
-          </button>
-
-          <Link
-            className="button"
-            to="/grievance/new"
-          >
-            ＋ {t('dashboard.reportIssue')}
-          </Link>
-        </div>
+        <KolkataRiverScene />
       </div>
 
       <div className="stat-grid">
@@ -123,7 +125,6 @@ export default function Dashboard() {
             </span>
           </div>
 
-          <span>{t('dashboard.liveStatus')}</span>
         </div>
 
         {msg && (
@@ -153,70 +154,19 @@ export default function Dashboard() {
             </Link>
           </div>
         ) : (
-          <div className="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>{t('dashboard.table.photo')}</th>
-                  <th>{t('dashboard.table.issue')}</th>
-                  <th>{t('dashboard.table.category')}</th>
-                  <th>{t('dashboard.table.location')}</th>
-                  <th>{t('dashboard.table.routedTo')}</th>
-                  <th>{t('dashboard.table.status')}</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {items.map((g) => (
-                  <tr key={g.id}>
-                    <td data-label={t('dashboard.table.photo')}>
-                      <PhotoThumb src={g.photo} />
-                    </td>
-
-                    <td
-                      data-label={t('dashboard.table.issue')}
-                      className="title-cell"
-                    >
-                      <Link to={`/grievance/${g.id}`}>{g.title}</Link>
-                    </td>
-
-                    <td data-label={t('dashboard.table.category')}>
-                      {t(`categories.${g.category}`, { ns: 'common', defaultValue: g.category })}
-                    </td>
-
-                    <td
-                      data-label={t('dashboard.table.location')}
-                      className="location-cell"
-                    >
-                      <MapLink source={g.location_source}
-                        lat={g.latitude}
-                        lng={g.longitude}
-                        address={g.location_address}
-                      />
-                    </td>
-
-                    <td
-                      data-label={t('dashboard.table.routedTo')}
-                      className="location-cell"
-                    >
-                      <MunicipalBadge
-                        body={g.municipal_body}
-                        district={g.municipal_district}
-                      />
-                    </td>
-
-                    <td data-label={t('dashboard.table.status')}>
-                      <span
-                        className={`status ${g.status}`}
-                      >
-                        {t(`statuses.${g.status}`, { ns: 'common', defaultValue: g.status.replace('_', ' ') })}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <ul className="citizen-report-list" aria-label={t('dashboard.tableHeading')}>
+            {items.map(g => (
+              <li key={g.id} className="citizen-report-row">
+                <div className="citizen-report-summary">
+                  <h3>{g.title}</h3>
+                  <p><span>{t('dashboard.submitted')} </span><ReportDate value={g.created_at} /></p>
+                </div>
+                <Link className="ghost-btn track-status-button" to={`/grievance/${g.id}`} aria-label={`${t('dashboard.trackStatus')}: ${g.title}`}>
+                  {t('dashboard.trackStatus')} <span aria-hidden="true">→</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
         )}
       </div>
     </>

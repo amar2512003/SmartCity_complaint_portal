@@ -1,3 +1,5 @@
+import KulladTea from './KulladTea';
+import './TeaGuide.css';
 import useDialog from '../hooks/useDialog';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -26,13 +28,14 @@ export default function InstructionsGuide() {
   const steps = t('instructions.steps', { returnObjects: true }) || [];
 
   return (
-    <div className="instructions-guide">
+    <div className="instructions-guide tea-guide">
       {open && (
         <div ref={dialogRef} className="instructions-panel panel" role="dialog" aria-modal="true" aria-label={t('instructions.title')}>
           <div className="instructions-panel-head">
             <div className="instructions-panel-title">
-              <span className="instructions-avatar" aria-hidden="true">?</span>
+              <span className="instructions-avatar"><KulladTea /></span>
               <div>
+                <span className="tea-guide-eyebrow">{t('instructions.teaLabel')}</span>
                 <strong>{t('instructions.title')}</strong>
                 <span>{t('instructions.subtitle')}</span>
               </div>
@@ -68,9 +71,10 @@ export default function InstructionsGuide() {
         type="button"
         className="instructions-fab"
         onClick={toggle} aria-expanded={open}
+        title={open ? t('instructions.closeFabAria') : t('instructions.openFabAria')}
         aria-label={open ? t('instructions.closeFabAria') : t('instructions.openFabAria')}
       >
-        {open ? '✕' : '?'}
+        <KulladTea />
       </button>
     </div>
   );

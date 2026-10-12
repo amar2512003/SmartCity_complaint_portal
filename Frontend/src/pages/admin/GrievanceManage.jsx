@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getAllGrievances } from "../../api/grievance.api";
-import PhotoThumb from "../../components/PhotoThumb";
+import ResolutionEvidence from "../../components/ResolutionEvidence";
 import MapLink from "../../components/MapLink";
 import MunicipalBadge from "../../components/MunicipalBadge";
 import ResolveGrievanceModal from "../../components/ResolveGrievanceModal";
@@ -69,26 +69,8 @@ export default function GrievanceManage() {
               district={report.municipal_district}
             />
           </div>
-          <div className="before-after-grid">
-            <div className="before-after-card">
-              <span className="before-after-label">
-                {t("grievanceDetail.beforePhoto", { ns: "citizen" })}
-              </span>
-              <PhotoThumb src={report.photo} />
-            </div>
-            <div className="before-after-card">
-              <span className="before-after-label">
-                {t("grievanceDetail.afterPhoto", { ns: "citizen" })}
-              </span>
-              {report.resolution_photo ? (
-                <PhotoThumb src={report.resolution_photo} />
-              ) : (
-                <div className="before-after-pending">
-                  {t("grievanceDetail.notResolvedYet", { ns: "citizen" })}
-                </div>
-              )}
-            </div>
-          </div>
+          <ResolutionEvidence report={report} />
+
           {report.status !== "resolved" && (
             <button
               className="primary-btn"
@@ -101,6 +83,7 @@ export default function GrievanceManage() {
           {resolving && (
             <ResolveGrievanceModal
               grievanceId={report.id}
+              beforePhoto={report.photo}
               onClose={() => setResolving(false)}
               onResolved={(data) => {
                 setReport({ ...report, ...data });
